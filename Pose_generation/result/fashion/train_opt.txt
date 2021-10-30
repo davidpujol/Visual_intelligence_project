@@ -1,0 +1,57 @@
+--------------Options--------------
+angle: False
+attn_layer: [2, 3]
+batchSize: 8
+checkpoints_dir: ./result
+continue_train: False
+dataroot: ./dataset/fashion
+dataset_mode: fashion
+display_env: fashion
+display_freq: 1000
+display_id: 1
+display_port: 8096
+display_single_pane_ncols: 0
+display_winsize: 256
+eval_iters_freq: 15000
+fid_gt_path: None
+gan_mode: lsgan
+gpu_ids: -1
+image_nc: 3
+init_type: orthogonal
+isTrain: True
+iter_count: 1
+kernel_size: {'2': 5, '3': 3}
+lambda_content: 0.5
+lambda_correct: 5.0
+lambda_g: 2.0
+lambda_rec: 5.0
+lambda_regularization: 0.0025
+lambda_style: 500.0
+layers: 3
+load_size: 256
+lr: 0.0001
+lr_policy: lambda
+max_dataset_size: 9223372036854775807
+model: pose
+nThreads: 8
+name: fashion
+netD: res
+netG: pose
+niter: 5000000
+niter_decay: 0
+no_html: False
+old_size: (256, 176)
+phase: train
+print_freq: 1000
+ratio_g2d: 0.1
+save_input: False
+save_iters_freq: 10000
+save_latest_freq: 1000
+scale: False
+serial_batches: False
+shift: False
+structure_nc: 18
+use_spect_d: True
+use_spect_g: False
+which_iter: latest
+----------------End----------------
