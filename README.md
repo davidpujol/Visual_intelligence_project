@@ -4,4 +4,4 @@ This project consists on an object substitution model based on natural language 
 
 ## Segmentation
 ### Usage
-run `python mask_rcnn_images -input input_image` to obtain segmentation results with a pre-trained model
+run `python mask_rcnn_images --input input_image` to obtain segmentation results with a pre-trained model
