@@ -168,6 +168,15 @@ def compute_cordinates(heatmap_avg, paf_avg, oriImg, th1=0.1, th2=0.05):
 
 # This transforms the list of coordinates into an image
 # This seems to be wrong?
+# def cords_to_map(cords, img_size, sigma=6):
+#     result = np.zeros(img_size + cords.shape[0:1], dtype='float32')
+#     for i, point in enumerate(cords):
+#         if point[0] == -1 or point[1] == -1:
+#             continue
+#         xx, yy = np.meshgrid(np.arange(img_size[1]), np.arange(img_size[0]))
+#         result[..., i] = np.exp(-((yy - point[0]) ** 2 + (xx - point[1]) ** 2) / (2 * sigma ** 2))
+#     return result
+
 def cords_to_map(cords, img_size, sigma=6):
     result = np.zeros(img_size + cords.shape[0:1], dtype='float32')
     for i, point in enumerate(cords):
@@ -176,7 +185,6 @@ def cords_to_map(cords, img_size, sigma=6):
         xx, yy = np.meshgrid(np.arange(img_size[1]), np.arange(img_size[0]))
         result[..., i] = np.exp(-((yy - point[0]) ** 2 + (xx - point[1]) ** 2) / (2 * sigma ** 2))
     return result
-
 
 def compute_pose_estimation(oriImg, img_name):
     # Set this parameters by default
@@ -212,8 +220,7 @@ def compute_pose_estimation(oriImg, img_name):
     pose_cords = compute_cordinates(heatmap_avg, paf_avg, oriImg)
 
     # Compute pose map
-    pose_cords = np.concatenate([np.expand_dims(pose_cords[:, 1], -1), np.expand_dims(pose_cords[:, 0], -1)], axis=1)
-    print(pose_cords)
+    #pose_cords = np.concatenate([np.expand_dims(pose_cords[:, 1], -1), np.expand_dims(pose_cords[:, 0], -1)], axis=1)
     img_size = (128, 64)
     pose_map = cords_to_map(pose_cords, img_size)
 

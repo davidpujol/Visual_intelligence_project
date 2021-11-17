@@ -6,6 +6,7 @@ from models.models import create_model
 from util.visualizer import Visualizer
 from util import html
 import time
+import util.util as util
 
 import matplotlib.pyplot as plt
 
@@ -37,10 +38,13 @@ for i, data in enumerate(dataset):
         break
 
     # Print the pose
-    #pose = data['BP1'][0].permute(1,2,0)
-    #plt.imshow(pose)
-    #plt.show()
-    #print(pose.shape)
+    aux = util.draw_pose_from_map(data['BP1'].data)[0]
+    plt.imshow(aux)
+    plt.show()
+
+    final_image = util.tensor2im(data['P1'].data)
+    plt.imshow(final_image)
+    plt.show()
 
     model.set_input(data)
     startTime = time.time()

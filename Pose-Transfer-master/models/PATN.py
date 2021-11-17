@@ -8,6 +8,8 @@ import util.util as util
 from util.image_pool import ImagePool
 from .base_model import BaseModel
 from . import networks
+import matplotlib.pyplot as plt
+
 
 # losses
 from losses.L1_plus_perceptualLoss import L1_plus_perceptualLoss
@@ -38,6 +40,7 @@ class TransferModel(BaseModel):
         self.netG = networks.define_G(input_nc, opt.P_input_nc,
                                         opt.ngf, opt.which_model_netG, opt.norm, not opt.no_dropout, opt.init_type, self.use_gpus,
                                         n_downsampling=opt.G_n_downsampling)
+
         if self.isTrain:
             use_sigmoid = opt.no_lsgan
             if opt.with_D_PB:
@@ -56,6 +59,7 @@ class TransferModel(BaseModel):
 
         if not self.isTrain or opt.continue_train:
             which_epoch = opt.which_epoch
+            print("LOADING THE NETWORK...")
             self.load_network(self.netG, 'netG', which_epoch)
             if self.isTrain:
                 if opt.with_D_PB:
@@ -138,7 +142,6 @@ class TransferModel(BaseModel):
         G_input = [self.input_P1, torch.cat((self.input_BP1, self.input_BP2), 1)]
         self.fake_p2 = self.netG(G_input)
 
-
     # We use this function to make an actual prediction without the corresponding output photo
     def predict(self, input_P1, input_BP1, input_BP2):
         # Preproces the input
@@ -151,7 +154,9 @@ class TransferModel(BaseModel):
         self.input_BP2 = Variable(self.input_BP2_set)  # pose of output image
 
         G_input = [self.input_P1, torch.cat((self.input_BP1, self.input_BP2), 1)]
-        return self.netG(G_input)
+        self.fake_p2 = self.netG(G_input)
+
+        return self.fake_p2
 
     # get image paths
     def get_image_paths(self):

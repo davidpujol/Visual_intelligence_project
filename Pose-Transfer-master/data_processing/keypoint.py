@@ -43,7 +43,6 @@ class KeyDataset(BaseDataset):
         P2_path = os.path.join(self.dir_P, P2_name) # person 2
         BP2_path = os.path.join(self.dir_K, P2_name + '.npy') # bone of person 2
 
-
         P1_img = Image.open(P1_path).convert('RGB')
         P2_img = Image.open(P2_path).convert('RGB')
 
