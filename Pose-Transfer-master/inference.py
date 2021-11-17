@@ -77,9 +77,9 @@ def process_image(opt, image1, pose1, pose2):
     #plt.imshow(final_image.data)
     #plt.show()
 
-    i = 0
-    visualizer.save_images_custom(output_path, i, final_image)
-
+    #i = 0
+    #visualizer.save_images_custom(output_path, i, final_image)
+    return final_image
 
 
 # RUN: python inference.py
@@ -94,4 +94,4 @@ if __name__ == '__main__':
     img1, pose1, pose2 = load_img(img_path, transform)
 
     # process the images
-    process_image(opt=opt, image1=img1, pose1=pose1, pose2=pose2)
+    final_image = process_image(opt=opt, image1=img1, pose1=pose1, pose2=pose2)
