@@ -1,12 +1,12 @@
 import torch.utils.data
-from data.base_data_loader import BaseDataLoader
+from data_processing.base_data_loader import BaseDataLoader
 
 
 def CreateDataset(opt):
     dataset = None
     print(opt.dataset_mode)
     if opt.dataset_mode == 'keypoint':
-        from data.keypoint import KeyDataset
+        from data_processing.keypoint import KeyDataset
         dataset = KeyDataset()
 
     else:

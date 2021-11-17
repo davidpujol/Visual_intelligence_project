@@ -1,7 +1,7 @@
 import os.path
 import torchvision.transforms as transforms
-from data.base_dataset import BaseDataset, get_transform
-from data.image_folder import make_dataset
+from data_processing.base_dataset import BaseDataset, get_transform
+from data_processing.image_folder import make_dataset
 from PIL import Image
 import PIL
 import random
@@ -24,12 +24,12 @@ class KeyDataset(BaseDataset):
         pairs_file_train = pd.read_csv(pairLst)
         self.size = len(pairs_file_train)
         self.pairs = []
-        print('Loading data pairs ...')
+        print('Loading data_processing pairs ...')
         for i in range(self.size):
             pair = [pairs_file_train.iloc[i]['from'], pairs_file_train.iloc[i]['to']]
             self.pairs.append(pair)
 
-        print('Loading data pairs finished ...')
+        print('Loading data_processing pairs finished ...')
 
     def __getitem__(self, index):
         if self.opt.phase == 'train':

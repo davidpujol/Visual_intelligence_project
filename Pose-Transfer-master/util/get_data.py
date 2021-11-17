@@ -85,7 +85,7 @@ class GetData(object):
 
         Args:
             save_path : str
-                A directory to save the data to.
+                A directory to save the data_processing to.
             dataset : str, optional
                 A specific dataset to download.
                 Note: this must include the file extension.
@@ -94,7 +94,7 @@ class GetData(object):
 
         Returns:
             save_path_full : str
-                The absolute path to the downloaded data.
+                The absolute path to the downloaded data_processing.
 
         """
         if dataset is None:

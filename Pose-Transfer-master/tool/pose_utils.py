@@ -148,7 +148,7 @@ if __name__ == "__main__":
     import pylab as plt
     import os
     i = 5
-    df = pd.read_csv('data/market-annotation-train.csv', sep=':')
+    df = pd.read_csv('data_processing/market-annotation-train.csv', sep=':')
 
     for index, row in df.iterrows():
         pose_cords = load_pose_cords_from_strings(row['keypoints_y'], row['keypoints_x'])
@@ -158,7 +158,7 @@ if __name__ == "__main__":
         mmm = produce_ma_mask(pose_cords, (128, 64)).astype(float)[..., np.newaxis].repeat(3, axis=-1)
         # print mmm.shape
         print(mmm.shape)
-        img = imread('data/market-dataset/train/' + row['name'])
+        img = imread('data_processing/market-dataset/train/' + row['name'])
 
         mmm[mask] = colors[mask]
 

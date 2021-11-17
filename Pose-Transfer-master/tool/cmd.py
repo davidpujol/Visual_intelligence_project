@@ -59,14 +59,14 @@ def args():
 
     args = parser.parse_args()
 
-    args.images_dir_train = 'data/' + args.dataset + '-dataset/train'
-    args.images_dir_test = 'data/' + args.dataset + '-dataset/test'
+    args.images_dir_train = 'data_processing/' + args.dataset + '-dataset/train'
+    args.images_dir_test = 'data_processing/' + args.dataset + '-dataset/test'
 
-    args.annotations_file_train = 'data/' + args.dataset + '-annotation-train.csv'
-    args.annotations_file_test = 'data/' + args.dataset + '-annotation-test.csv'
+    args.annotations_file_train = 'data_processing/' + args.dataset + '-annotation-train.csv'
+    args.annotations_file_test = 'data_processing/' + args.dataset + '-annotation-test.csv'
 
-    args.pairs_file_train = 'data/' + args.dataset + '-pairs-train.csv'
-    args.pairs_file_test = 'data/' + args.dataset + '-pairs-test.csv'
+    args.pairs_file_train = 'data_processing/' + args.dataset + '-pairs-train.csv'
+    args.pairs_file_test = 'data_processing/' + args.dataset + '-pairs-test.csv'
 
     if args.dataset == 'fasion':
         args.image_size = (256, 256)
