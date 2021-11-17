@@ -1,12 +1,13 @@
 import os
 from options.test_options import TestOptions
-from data.data_loader import CreateDataLoader
+from data_processing.data_loader import CreateDataLoader
 from models.models import create_model
 from tool.compute_coordinates_inference import compute_pose_estimation
 from util.visualizer import Visualizer
 from skimage.io import imread
 import matplotlib.pyplot as plt
 import torch
+import util.util as util
 
 
 # Prepare the options
@@ -33,6 +34,15 @@ def process_image(opt, image1, pose1, pose2):
 
     # Predict the new image
     final_image = model.predict(image1, pose1, pose2)
+    final_image = util.tensor2im(final_image.data)
+    print(final_image.shape)
+    # OPTIONAL
+    # Show the output image
+    #final_image = final_image.permute(0, 2, 3, 1)[0].detach().numpy()
+
+
+    plt.imshow(final_image)
+    plt.show()
 
     i = 0
     visualizer.save_images_custom(output_path, i, final_image)
@@ -41,23 +51,38 @@ def process_image(opt, image1, pose1, pose2):
 def load_img(input_path):
     # Load the original image
     oriImg = imread(input_path)[:, :, ::-1]  # B,G,R order
-    # plt.imshow(oriImg)
-    # plt.show()
+
     # Create its pose estimation
     img_name = input_path.split('/')[-1]
-    pose_img = compute_pose_estimation(oriImg, img_name)
 
+    pose_map = compute_pose_estimation(oriImg, img_name)
+    print(pose_map.shape)
     # What is the final representation of the pose?? Just the coordinates??
     # For now the representation is 128x64x18 (considering that the original image was 128x64)
     # Process the pose img
-    pose_img = torch.from_numpy(pose_img).float()  # h, w, c
-    print(pose_img.shape)
-    pose_img = pose_img.transpose(2, 0)  # c,w,h
-    pose_img = pose_img.transpose(2, 1)  # c,h,w
+    pose_img = torch.from_numpy(pose_map).float()  # h, w, c
+    pose_img = pose_img.permute(2, 0, 1)    # c, h, w
+    pose_img = torch.unsqueeze(pose_img, 0) # 1 x c x h x w
 
+    plt.imshow(oriImg)
+    plt.show()
     # How do we generate a random pose??
 
-    return img_name, pose_img, pose_img
+
+    print(pose_img.shape)
+    # Plot the pose of the image
+    aux = util.draw_pose_from_map(pose_img)[0]
+    plt.imshow(aux)
+    plt.show()
+
+    sys.exit()
+
+    # Reshape the original image into 1 x 3 x 128 x 64 (from 1 x 128 x 64 x 3)
+    aux = torch.from_numpy(oriImg.copy())
+    oriImg = torch.unsqueeze(aux, 0)
+    oriImg = oriImg.permute(0, 3, 1, 2)
+
+    return oriImg, pose_img, pose_img
 
 
 # RUN: python inference.py

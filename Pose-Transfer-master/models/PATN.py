@@ -141,15 +141,17 @@ class TransferModel(BaseModel):
 
     # We use this function to make an actual prediction without the corresponding output photo
     def predict(self, input_P1, input_BP1, input_BP2):
-        self.input_P1 = Variable(input_P1)  # input image 1
-        self.input_BP1 = Variable(input_BP1)  # pose of image 1
+        # Preproces the input
+        self.input_P1_set.resize_(input_P1.size()).copy_(input_P1)
+        self.input_BP1_set.resize_(input_BP1.size()).copy_(input_BP1)
+        self.input_BP2_set.resize_(input_BP2.size()).copy_(input_BP2)
 
-        self.input_BP2 = Variable(input_BP2)  # pose of such image
+        self.input_P1 = Variable(self.input_P1_set)  # input image 1
+        self.input_BP1 = Variable(self.input_BP1_set)  # pose of image 1
+        self.input_BP2 = Variable(self.input_BP2_set)  # pose of output image
 
         G_input = [self.input_P1, torch.cat((self.input_BP1, self.input_BP2), 1)]
         return self.netG(G_input)
-
-
 
     # get image paths
     def get_image_paths(self):
@@ -277,6 +279,7 @@ class TransferModel(BaseModel):
         input_P1 = util.tensor2im(self.input_P1.data)
         input_P2 = util.tensor2im(self.input_P2.data)
 
+        print(self.input_BP1.data.shape)
         input_BP1 = util.draw_pose_from_map(self.input_BP1.data)[0]
         input_BP2 = util.draw_pose_from_map(self.input_BP2.data)[0]
 

@@ -10,7 +10,6 @@ class PATBlock(nn.Module):
     def __init__(self, dim, padding_type, norm_layer, use_dropout, use_bias, cated_stream2=False):
         super(PATBlock, self).__init__()
         self.conv_block_stream1 = self.build_conv_block(dim, padding_type, norm_layer, use_dropout, use_bias, cal_att=False)
-        print(self.conv_block_stream1)
         self.conv_block_stream2 = self.build_conv_block(dim, padding_type, norm_layer, use_dropout, use_bias, cal_att=True, cated_stream2=cated_stream2)
 
     def build_conv_block(self, dim, padding_type, norm_layer, use_dropout, use_bias, cated_stream2=False, cal_att=False):

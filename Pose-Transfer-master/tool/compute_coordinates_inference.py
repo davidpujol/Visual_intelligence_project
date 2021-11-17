@@ -167,6 +167,7 @@ def compute_cordinates(heatmap_avg, paf_avg, oriImg, th1=0.1, th2=0.05):
 
 
 # This transforms the list of coordinates into an image
+# This seems to be wrong?
 def cords_to_map(cords, img_size, sigma=6):
     result = np.zeros(img_size + cords.shape[0:1], dtype='float32')
     for i, point in enumerate(cords):
@@ -212,8 +213,8 @@ def compute_pose_estimation(oriImg, img_name):
 
     # Compute pose map
     pose_cords = np.concatenate([np.expand_dims(pose_cords[:, 1], -1), np.expand_dims(pose_cords[:, 0], -1)], axis=1)
+    print(pose_cords)
     img_size = (128, 64)
     pose_map = cords_to_map(pose_cords, img_size)
-    print(pose_map.shape)
 
     return pose_map

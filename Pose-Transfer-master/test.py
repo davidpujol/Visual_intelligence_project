@@ -7,6 +7,9 @@ from util.visualizer import Visualizer
 from util import html
 import time
 
+import matplotlib.pyplot as plt
+
+
 opt = TestOptions(norm='batch', how_many=20, BP_input_nc=18, dataroot='./market_data/',
                    name='market_PATN', nThreads=1, model='PATN', phase='test', dataset_mode='keypoint', batchSize=1,
                    serial_batches=True, no_flip=True, checkpoints_dir='./checkpoints', which_model_netG='PATN',
@@ -32,6 +35,13 @@ for i, data in enumerate(dataset):
     print(' process %d/%d img ..'%(i,opt.how_many))
     if i >= opt.how_many:
         break
+
+    # Print the pose
+    #pose = data['BP1'][0].permute(1,2,0)
+    #plt.imshow(pose)
+    #plt.show()
+    #print(pose.shape)
+
     model.set_input(data)
     startTime = time.time()
     model.test()
