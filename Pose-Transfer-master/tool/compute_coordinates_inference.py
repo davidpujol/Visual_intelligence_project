@@ -5,6 +5,7 @@ import tensorflow as tf
 import skimage.transform as st
 from skimage.transform import resize
 from scipy.ndimage import gaussian_filter
+import torch
 
 pose_estimation_model_path = './checkpoints/pose_estimator.h5'
 model = tf.keras.models.load_model(pose_estimation_model_path)
@@ -224,4 +225,13 @@ def compute_pose_estimation(oriImg, img_name):
     img_size = (128, 64)
     pose_map = cords_to_map(pose_cords, img_size)
 
-    return pose_map
+
+    # Obtain the final representation
+    # What is the final representation of the pose?? Just the coordinates??
+    # For now the representation is 128x64x18 (considering that the original image was 128x64)
+    # Process the pose img
+    pose_img = torch.from_numpy(pose_map).float()  # h, w, c
+    pose_img = pose_img.permute(2, 0, 1)  # c, h, w
+    pose_img = torch.unsqueeze(pose_img, 0)  # 1 x c x h x w
+
+    return pose_img

@@ -10,15 +10,19 @@ import torch
 import util.util as util
 from data_processing.base_dataset import BaseDataset, get_transform
 from PIL import Image
+import numpy as np
 
 
 # Prepare the options
 def set_options_inference():
     opt = TestOptions(norm='batch', how_many=20, BP_input_nc=18, dataroot='./market_data/',
                       name='market_PATN', nThreads=1, model='PATN', phase='test', dataset_mode='keypoint', batchSize=1,
-                      serial_batches=True, no_flip=True, checkpoints_dir='./checkpoints', which_model_netG='PATN',
+                      serial_batches=False, no_flip=True, checkpoints_dir='./checkpoints', which_model_netG='PATN',
                       pairLst='./market_data/market-pairs-test.csv', results_dir='./results', resize_or_crop='no', which_epoch='latest', display_id=0)
     return opt
+
+
+
 
 def load_img(input_path, transform):
     # Load the original image
@@ -26,16 +30,7 @@ def load_img(input_path, transform):
     # Create its pose estimation
     img_name = input_path.split('/')[-1]
 
-    pose_map = compute_pose_estimation(oriImg, img_name)
-
-    # What is the final representation of the pose?? Just the coordinates??
-    # For now the representation is 128x64x18 (considering that the original image was 128x64)
-    # Process the pose img
-    pose_img = torch.from_numpy(pose_map).float()  # h, w, c
-    pose_img = pose_img.permute(2, 0, 1)    # c, h, w
-    pose_img = torch.unsqueeze(pose_img, 0) # 1 x c x h x w
-
-    # How do we generate a random pose??
+    pose_img = compute_pose_estimation(oriImg, img_name)
 
     # Plot the pose of the image
     #aux = util.draw_pose_from_map(pose_img)[0]
@@ -53,7 +48,20 @@ def load_img(input_path, transform):
     #plt.imshow(aux)
     #plt.show()
 
-    return P1, pose_img, pose_img
+    return P1, pose_img
+
+
+def compute_random_pose(dataset):
+    rand_idx = np.random.randint(len(dataset))
+    BP2 =  torch.unsqueeze(dataset[rand_idx]['BP1'], 0)
+
+    aux = util.draw_pose_from_map(BP2)[0]
+    
+    #plt.imshow(aux)
+    #plt.show()
+
+    return BP2
+
 
 # Provide the input image 1, the pose of image 1, and the pose of the new image
 # Format: P1 image has shape torch.Size([1,3,128,64]) IMPORTANT!!
@@ -74,8 +82,8 @@ def process_image(opt, image1, pose1, pose2):
 
     # Transform it to an image
     final_image = util.tensor2im(final_image.data)
-    #plt.imshow(final_image.data)
-    #plt.show()
+    plt.imshow(final_image.data)
+    plt.show()
 
     #i = 0
     #visualizer.save_images_custom(output_path, i, final_image)
@@ -88,10 +96,17 @@ if __name__ == '__main__':
     opt = set_options_inference()
     transform = get_transform(opt)
 
+    # Create the dataset from which we extract random poses
+    data_loader = CreateDataLoader(opt)
+    #dataset = data_loader.load_data()
+    dataset = data_loader.load_dataset()
+
     # read the corresponding images
     img_path = os.path.abspath('./test_inference_img/0002_c1s1_000451_03.jpg')
     output_path = os.path.abspath('./')
-    img1, pose1, pose2 = load_img(img_path, transform)
+    img1, pose1 = load_img(img_path, transform)
+
+    pose2 = compute_random_pose(dataset)
 
     # process the images
     final_image = process_image(opt=opt, image1=img1, pose1=pose1, pose2=pose2)
