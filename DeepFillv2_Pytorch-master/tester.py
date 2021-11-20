@@ -1,6 +1,6 @@
-import pytorch
-import pytorch.nn as nn
-import pytorch.backends.cudnn as cudnn
+import torch
+import torch.nn as nn
+import torch.backends.cudnn as cudnn
 import os
 import time
 import datetime
@@ -71,5 +71,5 @@ def WGAN_tester(opt):
         mask = torch.cat((mask, mask, mask), 1)
         img_list = [second_out_wholeimg]
         name_list = ['second_out']
-        utils.save_sample_png(sample_folder = results_path, sample_name = '%d' % (batch_idx + 1), img_list = img_list, name_list = name_list, pixel_max_cnt = 255)
+        utils.save_sample_png(sample_folder = opt.results_path, sample_name = '%d' % (batch_idx + 1), img_list = img_list, name_list = name_list, pixel_max_cnt = 255)
         print('----------------------batch_idx%d' % (batch_idx + 1) + ' has been finished----------------------')
