@@ -8,7 +8,7 @@ from torchvision.transforms import transforms as transforms
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--input', required=True, 
-                    help='path to the input data_processing')
+                    help='path to the input data')
 parser.add_argument('-t', '--threshold', default=0.965, type=float,
                     help='score threshold for discarding detection')
 args = vars(parser.parse_args())
@@ -43,6 +43,6 @@ for image in images:
     cv2.imshow('Segmented image', image)
     cv2.waitKey(0)
 # # # set the save path
-save_path = f"../output/{args['input'].split('/')[-1].split('.')[0]}.jpg"
-cv2.imwrite(save_path, images)
+# save_path = f"../output/{args['input'].split('/')[-1].split('.')[0]}.jpg"
+# cv2.imwrite(save_path, images)
 

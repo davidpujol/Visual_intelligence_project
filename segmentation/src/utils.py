@@ -1,3 +1,4 @@
+from PIL.Image import new
 import cv2
 import numpy as np
 import random
@@ -61,24 +62,38 @@ def split_per_person(image, masks, labels):
     gamma = 0 # scalar added to each sum
     images = []
     image = np.array(image)
+    person_masks = []
     images.append(cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
+
 
     for i in range(len(masks)):
         if labels[i] == 'person':
-            red_map = np.zeros_like(masks[i]).astype(np.uint8)
-            green_map = np.zeros_like(masks[i]).astype(np.uint8)
-            blue_map = np.zeros_like(masks[i]).astype(np.uint8)
-            red_map[masks[i] == 1], green_map[masks[i] == 1], blue_map[masks[i] == 1]  = color
-            segmentation_map = np.stack([red_map, green_map, blue_map], axis=2)
+            person_masks.append(masks[i])
+    
+    for i in range(len(person_masks)):
+        new_mask = np.zeros_like(person_masks[i]).astype(np.uint8)
+        for j in range(len(person_masks)):
+            if j != i:
+                new_mask = new_mask | person_masks[j]
+        red_map = np.zeros_like(new_mask).astype(np.uint8)
+        green_map = np.zeros_like(new_mask).astype(np.uint8)
+        blue_map = np.zeros_like(new_mask).astype(np.uint8)
+        red_map[new_mask == 1], green_map[new_mask == 1], blue_map[new_mask == 1]  = color
+        segmentation_map = np.stack([red_map, green_map, blue_map], axis=2)
 
-            # convert from RGN to OpenCV BGR format
-            image_per_person = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        # convert from RGN to OpenCV BGR format
+        image_per_person = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-            # apply mask on the image
-            cv2.addWeighted(image_per_person, alpha, segmentation_map, beta, gamma, image_per_person)
-            images.append(image_per_person)
+        # apply mask on the image
+        cv2.addWeighted(image_per_person, alpha, segmentation_map, beta, gamma, image_per_person)
+        images.append(image_per_person)
 
     return images
+
+# def construct_seg_map(person_masks, i):
+#     seg_maps = []
+#     for i in range(len(person_masks)):
+
 
 
 
