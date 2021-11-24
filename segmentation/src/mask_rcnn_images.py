@@ -3,7 +3,7 @@ import torchvision
 import cv2
 import argparse
 from PIL import Image
-from utils import draw_segmentation_map, get_outputs, split_person
+from utils import draw_segmentation_map, get_outputs, split_person, split_per_person
 from torchvision.transforms import transforms as transforms
 
 parser = argparse.ArgumentParser()
@@ -36,11 +36,13 @@ image = transform(image)
 image = image.unsqueeze(0).to(device)
 masks, boxes, labels = get_outputs(image, model, args['threshold'])
 # result = draw_segmentation_map(orig_image, masks, boxes, labels)
-result = split_person(orig_image, masks, labels)
-# visualize the image
-cv2.imshow('Segmented image', result)
-cv2.waitKey(0)
-# # set the save path
+# result = split_person(orig_image, masks, labels)
+images = split_per_person(orig_image, masks, labels)
+for image in images:
+    # visualize the image
+    cv2.imshow('Segmented image', image)
+    cv2.waitKey(0)
+# # # set the save path
 save_path = f"../output/{args['input'].split('/')[-1].split('.')[0]}.jpg"
-cv2.imwrite(save_path, result)
+cv2.imwrite(save_path, images)
 
