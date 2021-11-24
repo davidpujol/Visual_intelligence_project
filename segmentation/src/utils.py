@@ -54,6 +54,33 @@ def split_person(image, masks, labels):
     return image
 
 
+def split_per_person(image, masks, labels):
+    color = np.array([255,255,255])
+    alpha = 1 
+    beta = 1# transparency for the segmentation map
+    gamma = 0 # scalar added to each sum
+    images = []
+    image = np.array(image)
+    images.append(cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
+
+    for i in range(len(masks)):
+        if labels[i] == 'person':
+            red_map = np.zeros_like(masks[i]).astype(np.uint8)
+            green_map = np.zeros_like(masks[i]).astype(np.uint8)
+            blue_map = np.zeros_like(masks[i]).astype(np.uint8)
+            red_map[masks[i] == 1], green_map[masks[i] == 1], blue_map[masks[i] == 1]  = color
+            segmentation_map = np.stack([red_map, green_map, blue_map], axis=2)
+
+            # convert from RGN to OpenCV BGR format
+            image_per_person = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+            # apply mask on the image
+            cv2.addWeighted(image_per_person, alpha, segmentation_map, beta, gamma, image_per_person)
+            images.append(image_per_person)
+
+    return images
+
+
 
 
 def draw_segmentation_map(image, masks, boxes, labels):
