@@ -54,6 +54,20 @@ def split_person(image, masks, labels):
 
     return image
 
+def bbox_per_person(image, bboxs, labels):
+    image = np.array(image)
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    person_bboxs = []
+    person_images = []
+    person_images.append(image)
+    for i in range(len(bboxs)):
+        if labels[i] == 'person':
+            person_bboxs.append(bboxs[i])
+    for box in person_bboxs:
+        crop = image[box[0][1]:box[1][1],box[0][0]:box[1][0],:]
+        person_images.append(crop)
+
+    return person_images
 
 def split_per_person(image, masks, labels):
     color = np.array([255,255,255])
