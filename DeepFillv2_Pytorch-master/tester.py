@@ -56,13 +56,9 @@ def WGAN_tester(opt):
     # ----------------------------------------
     # Testing loop
     for batch_idx, (img, mask) in enumerate(dataloader):
-        print(len(img), flush=True)
         img = img.cuda()
         mask = mask.cuda()
-	
-        print(len(img), flush=True)
-        print(len(mask), flush=True)
-	
+
         # Generator output
         with torch.no_grad():
             first_out, second_out = generator(img, mask)

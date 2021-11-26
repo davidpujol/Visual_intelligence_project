@@ -31,7 +31,7 @@ def create_perceptualnet():
     perceptualnet = network.PerceptualNet()
     print('Perceptual network is created!')
     return perceptualnet
-    
+
 # ----------------------------------------
 #             PATH processing
 # ----------------------------------------
@@ -80,7 +80,7 @@ def text_save(content, filename, mode = 'a'):
 def check_path(path):
     if not os.path.exists(path):
         os.makedirs(path)
-    
+
 # ----------------------------------------
 #    Validation and Sample at training
 # ----------------------------------------

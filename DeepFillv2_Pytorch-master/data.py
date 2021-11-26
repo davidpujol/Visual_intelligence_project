@@ -6,26 +6,29 @@ import imgcrop
 import random
 import math
 from PIL import Image, ImageDraw
+from torch.utils.data.dataset import T_co
 
 from torchvision import transforms
 from torch.utils.data import Dataset
 
 import utils
 
-class InpaintDataset(Dataset):
+
+class Data(Dataset):
     def __init__(self, opt):
         self.opt = opt
-        self.imglist = sorted(utils.get_files(opt.baseroot), key=lambda d:int(d.split('/')[-1].split('.')[0]))
-        self.masklist = sorted(utils.get_files(opt.baseroot_mask), key=lambda d:int(d.split('/')[-1].split('.')[0]))
+
+        self.img = opt.image
+        self.mask = opt.mask
 
     def __len__(self):
-        return len(self.imglist)
+        return 1
 
-    def __getitem__(self, index):
+    def __getitem__(self, index=0):
         # image
-        img = cv2.imread(self.imglist[index])
-        mask = cv2.imread(self.masklist[index])[:, :, 0]
-        
+        img = cv2.imread(self.img)
+        mask = cv2.imread(self.mask)[:, :, 0]
+
         # find the Minimum bounding rectangle in the mask
         '''
         contours, hier = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -37,5 +40,5 @@ class InpaintDataset(Dataset):
 
         img = torch.from_numpy(img.astype(np.float32) / 255.0).permute(2, 0, 1).contiguous()
         mask = torch.from_numpy(mask.astype(np.float32) / 255.0).unsqueeze(0).contiguous()
-
+        print(img.size(), flush=True)
         return img, mask
