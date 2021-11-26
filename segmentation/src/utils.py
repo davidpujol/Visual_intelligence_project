@@ -3,10 +3,50 @@ import cv2
 import numpy as np
 import random
 import torch
+import torchvision
+from PIL import Image
+from torchvision.transforms import transforms as transforms
 from coco_names import COCO_INSTANCE_CATEGORY_NAMES as coco_names
 
 # this will help us create a different color for each class
 COLORS = np.random.uniform(0, 255, size=(len(coco_names), 3))
+
+# This function returns the model to do the image segmentation
+def create_model():
+    # initialize the model
+    model = torchvision.models.detection.maskrcnn_resnet50_fpn(pretrained=True, progress=True,
+                                                               num_classes=91)
+    # set the computation device
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    # load the modle on to the computation device and set to eval mode
+    model.to(device).eval()
+    return model
+
+# This function takes as input the path of an image, the threshold and the model. Then, it produces its mask, boounding boxes, and labels
+def process_image(image_path, threshold, model):
+    image = Image.open(image_path).convert('RGB')
+    # keep a copy of the original image for OpenCV functions and applying masks
+    orig_image = image.copy()
+
+    # transform to convert the image to tensor
+    transform = transforms.Compose([
+        transforms.ToTensor()
+    ])
+
+    # Define the device
+    # set the computation device
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    # load the modle on to the computation device and set to eval mode
+    model.to(device).eval()
+
+    # transform the image
+    image = transform(image)
+    # add a batch dimension
+    image = image.unsqueeze(0).to(device)
+    masks, boxes, labels = get_outputs(image, model, threshold)
+
+    return orig_image, masks, boxes, labels
+
 
 def get_outputs(image, model, threshold):
     with torch.no_grad():

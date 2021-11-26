@@ -187,7 +187,7 @@ def cords_to_map(cords, img_size, sigma=6):
         result[..., i] = np.exp(-((yy - point[0]) ** 2 + (xx - point[1]) ** 2) / (2 * sigma ** 2))
     return result
 
-def compute_pose_estimation(oriImg, img_name):
+def compute_pose_estimation(oriImg):
     # Set this parameters by default
     threshold = 0.1
     boxsize = 368

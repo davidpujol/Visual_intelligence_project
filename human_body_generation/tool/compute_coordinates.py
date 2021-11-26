@@ -10,7 +10,7 @@ from skimage.io import imread
 from skimage.transform import resize
 from scipy.ndimage import gaussian_filter
 
-model = load_model('/Users/david/Documents/EPFL/Courses/Computer Vision/VisualIntelligence/Pose-Transfer-master/checkpoints/pose_estimator.h5')
+model = load_model('/Users/david/Documents/EPFL/Courses/Computer Vision/VisualIntelligence/human_body_generation/checkpoints/pose_estimator.h5')
 
 
 mapIdx = [[31,32], [39,40], [33,34], [35,36], [41,42], [43,44], [19,20], [21,22],
