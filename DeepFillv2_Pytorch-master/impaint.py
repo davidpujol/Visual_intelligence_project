@@ -1,6 +1,7 @@
 import argparse
 import os
 
+from PIL import Image
 import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
@@ -10,6 +11,7 @@ import datetime
 import numpy as np
 import cv2
 
+from torch.utils.data import TensorDataset
 from torch.utils.data import DataLoader
 
 import network
@@ -48,11 +50,38 @@ def impaint(opt):
 
     #load images
     img = cv2.imread(opt.image)
-    mask = cv2.imread(opt.mask)
+    mask = cv2.imread(opt.mask)[:, :, 0]
+    
+    print(len(img), flush=True)
+    print(len(img), len(img[0]), len(img[0][0]), flush=True)
+    
+    
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
+    img = torch.from_numpy(img.astype(np.float32) / 255.0).permute(2, 0, 1).contiguous()
+    mask = torch.from_numpy(mask.astype(np.float32) / 255.0).unsqueeze(0).contiguous()
+    
+    dataset = TensorDataset(img)
+    dataset2 = TensorDataset(mask)
+    
+    # Define the dataloader
+    dataloader = DataLoader(dataset, batch_size = opt.batch_size, shuffle = False, num_workers = opt.num_workers, pin_memory = True)
+    dataloader2 = DataLoader(dataset2, batch_size = opt.batch_size, shuffle = False, num_workers = opt.num_workers, pin_memory = True)
+    
+    for batch_id, data_img in enumerate(dataloader):
+        img = data_img[0]
+        print(batch_id)
+        print(img, flush=True)
+    for batch_id, mask in enumerate(dataloader2):
+    	mask = mask[0]
+    	
+    
     img = img.cuda()
     mask = mask.cuda()
 
+    print(len(img), flush=True)
+    print(len(mask), flush=True)
+        
     # Generator output
     with torch.no_grad():
         first_out, second_out = generator(img, mask)
@@ -90,7 +119,7 @@ if __name__=="__main__":
     parser.add_argument('--cudnn_benchmark', type=bool, default=True, help='True for unchanged input data type')
     # Training parameters
     parser.add_argument('--epoch', type=int, default=40, help='number of epochs of training')
-    parser.add_argument('--batch_size', type=int, default=1, help='size of the batches')
+    parser.add_argument('--batch_size', type=int, default=4, help='size of the batches')
     parser.add_argument('--num_workers', type=int, default=8,
                         help='number of cpu threads to use during batch generation')
     # Network parameters
@@ -100,7 +129,7 @@ if __name__=="__main__":
     parser.add_argument('--pad_type', type=str, default='zero', help='the padding type')
     parser.add_argument('--activation', type=str, default='lrelu', help='the activation type')
     parser.add_argument('--norm', type=str, default='in', help='normalization type')
-    parser.add_argument('--init_type', type=str, default='xavier', help='the initialization type')
+    parser.add_argument('--init_type', type=str, default='normal', help='the initialization type')
     parser.add_argument('--init_gain', type=float, default=0.02, help='the initialization gain')
     # Dataset parameters
     parser.add_argument('--baseroot', type=str, default='../../inpainting/dataset/Places/img_set')
