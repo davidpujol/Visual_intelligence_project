@@ -1,17 +1,8 @@
-import os
 import cv2
 import numpy as np
 import torch
-import imgcrop
-import random
-import math
-from PIL import Image, ImageDraw
-from torch.utils.data.dataset import T_co
 
-from torchvision import transforms
 from torch.utils.data import Dataset
-
-import utils
 
 
 class Data(Dataset):
