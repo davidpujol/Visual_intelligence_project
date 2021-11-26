@@ -30,7 +30,7 @@ def load_img(input_path, transform):
     # Create its pose estimation
     img_name = input_path.split('/')[-1]
 
-    pose_img = compute_pose_estimation(oriImg, img_name)
+    pose_img = compute_pose_estimation(oriImg)
 
     # Plot the pose of the image
     #aux = util.draw_pose_from_map(pose_img)[0]

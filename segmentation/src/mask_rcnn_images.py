@@ -49,3 +49,5 @@ for image in images:
 # save_path = f"../output/{args['input'].split('/')[-1].split('.')[0]}.jpg"
 # cv2.imwrite(save_path, images)
 
+
+
