@@ -1,9 +1,8 @@
-import torch
-import torch.nn as nn
 import torch.nn.init as init
 import torchvision
 
 from network_module import *
+
 
 def weights_init(net, init_type = 'kaiming', init_gain = 0.02):
     """Initialize network weights.
@@ -109,6 +108,8 @@ class GatedGenerator(nn.Module):
         # img: entire img
         # mask: 1 for mask region; 0 for unmask region
         # Coarse
+        print("image", img.size(), flush=True)
+        print("mask", mask.size(), flush=True)
         first_masked_img = img * (1 - mask) + mask
         first_in = torch.cat((first_masked_img, mask), dim=1)       # in: [B, 4, H, W]
         first_out = self.coarse(first_in)                           # out: [B, 3, H, W]

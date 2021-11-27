@@ -25,6 +25,7 @@ class InpaintDataset(Dataset):
         # image
         img = cv2.imread(self.imglist[index])
         mask = cv2.imread(self.masklist[index])[:, :, 0]
+        
         # find the Minimum bounding rectangle in the mask
         '''
         contours, hier = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -36,4 +37,5 @@ class InpaintDataset(Dataset):
 
         img = torch.from_numpy(img.astype(np.float32) / 255.0).permute(2, 0, 1).contiguous()
         mask = torch.from_numpy(mask.astype(np.float32) / 255.0).unsqueeze(0).contiguous()
+
         return img, mask
