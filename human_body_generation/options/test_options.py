@@ -21,7 +21,7 @@ class TestOptions:
      model = attr.ib(default='cycle_gan')
      which_direction = attr.ib(default='AtoB')
      nThreads = attr.ib(default=2)
-     checkpoints_dir = attr.ib(default='./checkpoints')
+     checkpoints_dir = attr.ib(default='./human_body_generation/checkpoints')
      norm = attr.ib(default='instance')
      serial_batches = attr.ib(default=True)
      display_winsize = attr.ib(default=256)
@@ -36,7 +36,7 @@ class TestOptions:
      P_input_nc = attr.ib(default=3)
      BP_input_nc = attr.ib(default=1)
      padding_type = attr.ib(default='reflect')
-     pairLst = attr.ib(default='./keypoint_data/market-pairs-train.csv')
+     pairLst = attr.ib(default='./human_body_generation/keypoint_data/market-pairs-train.csv')
 
      with_D_PP = attr.ib(default=1)
      with_D_PB = attr.ib(default=1)
@@ -49,7 +49,7 @@ class TestOptions:
 
      # Specific training options
      ntest = attr.ib(default=float("inf"))
-     results_dir = attr.ib(default='./results/')
+     results_dir = attr.ib(default='./human_body_generation/results/')
      aspect_ratio = attr.ib(default=1.0)
      phase = attr.ib(default='test')
      which_epoch = attr.ib(default='latest')
@@ -57,16 +57,3 @@ class TestOptions:
      isTrain = attr.ib(default=False)
 
 
-
-# class TestOptions(BaseOptions):
-#       def initialize(self):
-#           BaseOptions.initialize(self)
-#           self.parser.add_argument('--ntest', type=int, default=float("inf"), help='# of test examples.')
-#           self.parser.add_argument('--results_dir', type=str, default='./results/', help='saves results here.')
-#           self.parser.add_argument('--aspect_ratio', type=float, default=1.0, help='aspect ratio of result images')
-#           self.parser.add_argument('--phase', type=str, default='test', help='train, val, test, etc')
-#           self.parser.add_argument('--which_epoch', type=str, default='latest', help='which epoch to load? set to latest to use latest cached model')
-#           self.parser.add_argument('--how_many', type=int, default=200, help='how many test images to run')
-#
-#           self.isTrain = False
-#           self.use_gpus =False

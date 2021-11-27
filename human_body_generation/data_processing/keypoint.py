@@ -1,7 +1,7 @@
 import os.path
 import torchvision.transforms as transforms
-from data_processing.base_dataset import BaseDataset, get_transform
-from data_processing.image_folder import make_dataset
+from human_body_generation.data_processing.base_dataset import BaseDataset, get_transform
+from human_body_generation.data_processing.image_folder import make_dataset
 from PIL import Image
 import PIL
 import random
