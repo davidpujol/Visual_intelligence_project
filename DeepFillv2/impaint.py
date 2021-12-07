@@ -7,11 +7,11 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
-import utils
-from data import Data
+import DeepFillv2.utils as utils
+from DeepFillv2.data import Data
 
 
-def impaint():
+def impaint(image, mask):
 
 
     def load_model_generator(net, epoch, opt):

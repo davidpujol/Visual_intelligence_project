@@ -6,7 +6,7 @@ import torch
 import torchvision
 from PIL import Image
 from torchvision.transforms import transforms as transforms
-from coco_names import COCO_INSTANCE_CATEGORY_NAMES as coco_names
+from segmentation.src.coco_names import COCO_INSTANCE_CATEGORY_NAMES as coco_names
 
 # this will help us create a different color for each class
 COLORS = np.random.uniform(0, 255, size=(len(coco_names), 3))

@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 import torchvision as tv
 
-import network
+import DeepFillv2.network as network
 
 # ----------------------------------------
 #        Initialize the parameters
@@ -33,14 +33,8 @@ def init():
     parser.add_argument('--init_type', type=str, default='normal', help='the initialization type')
     parser.add_argument('--init_gain', type=float, default=0.02, help='the initialization gain')
 
-    #Images
-    parser.add_argument('--image', type=str, default='')
-    parser.add_argument('--mask', type=str, default='')
-
     opt = parser.parse_args()
 
-    if opt.image == '' or opt.mask == '':
-        raise ReferenceError("Wrong usage, use --image path/to/image --mask path/to/mask")
     return opt
 
 
@@ -139,3 +133,18 @@ def reduce_sum(x, axis=None, keepdim=False):
     for i in sorted(axis, reverse=True):
         x = torch.sum(x, dim=i, keepdim=keepdim)
     return x
+
+#----------------------------------
+#        Input processing
+#----------------------------------
+
+def concat_masks(masks):
+    tot_mask = masks[0]
+    print(tot_mask, flush=True)
+    if len(masks) == 1:
+        return tot_mask
+
+    for m in masks[1:]:
+        tot_mask = tot_mask | m
+
+    return tot_mask.astype(np.float32) * 255
