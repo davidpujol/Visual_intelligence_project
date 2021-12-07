@@ -4,15 +4,15 @@ import os
 from collections import OrderedDict
 from torch.autograd import Variable
 import itertools
-import human_body_generation.util.util as util
-from human_body_generation.util.image_pool import ImagePool
+from util import util
+from util import image_pool as ImagePool
 from .base_model import BaseModel
 from . import networks
 import matplotlib.pyplot as plt
 
 
 # losses
-from human_body_generation.losses.L1_plus_perceptualLoss import L1_plus_perceptualLoss
+from losses.L1_plus_perceptualLoss import L1_plus_perceptualLoss
 
 import sys
 import torch.nn.functional as F

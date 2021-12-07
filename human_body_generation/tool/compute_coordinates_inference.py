@@ -7,7 +7,10 @@ from skimage.transform import resize
 from scipy.ndimage import gaussian_filter
 import torch
 
-pose_estimation_model_path = './human_body_generation/checkpoints/pose_estimator.h5'
+# The relative path depends on which of the two scripts we use to run this functionality (inference.py or main.py)
+pose_estimation_model_path = './checkpoints/pose_estimator.h5'
+if not os.path.exists(os.path.abspath('./checkpoints/pose_estimator.h5')):
+    pose_estimation_model_path = './human_body_generation/checkpoints/pose_estimator.h5'
 model = tf.keras.models.load_model(pose_estimation_model_path)
 
 

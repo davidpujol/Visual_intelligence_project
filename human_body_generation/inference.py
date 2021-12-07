@@ -7,11 +7,10 @@ from util.visualizer import Visualizer
 from skimage.io import imread
 import matplotlib.pyplot as plt
 import torch
-import util.util as util
+from util import util
 from data_processing.base_dataset import BaseDataset, get_transform
 from PIL import Image
 import numpy as np
-
 
 # Prepare the options
 def set_options_inference():
@@ -20,8 +19,6 @@ def set_options_inference():
                       serial_batches=False, no_flip=True, checkpoints_dir='./checkpoints', which_model_netG='PATN',
                       pairLst='./market_data/market-pairs-test.csv', results_dir='./results', resize_or_crop='no', which_epoch='latest', display_id=0)
     return opt
-
-
 
 
 def load_img(input_path, transform):
