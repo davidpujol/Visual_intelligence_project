@@ -28,7 +28,7 @@ def load_img(input_path, transform):
     # Load the original image
     oriImg = imread(input_path)[:,:, ::-1]# B,G,R order
     # Create its pose estimation
-    img_name = input_path.split('/')[-1]
+    #img_name = input_path.split('/')[-1]
 
     pose_img = compute_pose_estimation(oriImg)
 

@@ -1,24 +1,24 @@
 import os
-from options.test_options import TestOptions
-from data_processing.data_loader import CreateDataLoader
-from models.models import create_model
-from tool.compute_coordinates_inference import compute_pose_estimation
-from util.visualizer import Visualizer
+from human_body_generation.options.test_options import TestOptions
+from human_body_generation.data_processing.data_loader import CreateDataLoader
+from human_body_generation.models.models import create_model
+from human_body_generation.tool.compute_coordinates_inference import compute_pose_estimation
+#from util.visualizer import Visualizer
 from skimage.io import imread
 import matplotlib.pyplot as plt
 import torch
-import util.util as util
-from data_processing.base_dataset import BaseDataset, get_transform
+import human_body_generation.util.util as util
+from human_body_generation.data_processing.base_dataset import BaseDataset, get_transform
 from PIL import Image
 import numpy as np
 
 
 # Prepare the options
 def set_options_inference():
-    opt = TestOptions(norm='batch', how_many=20, BP_input_nc=18, dataroot='./market_data/',
+    opt = TestOptions(norm='batch', how_many=20, BP_input_nc=18, dataroot='./human_body_generation/market_data/',
                       name='market_PATN', nThreads=1, model='PATN', phase='test', dataset_mode='keypoint', batchSize=1,
-                      serial_batches=False, no_flip=True, checkpoints_dir='./checkpoints', which_model_netG='PATN',
-                      pairLst='./market_data/market-pairs-test.csv', results_dir='./results', resize_or_crop='no', which_epoch='latest', display_id=0)
+                      serial_batches=False, no_flip=True, checkpoints_dir='./human_body_generation/checkpoints', which_model_netG='PATN',
+                      pairLst='./human_body_generation/market_data/market-pairs-test.csv', results_dir='./human_body_generation/results', resize_or_crop='no', which_epoch='latest', display_id=0)
     return opt
 
 
@@ -100,6 +100,10 @@ def compute_new_image(oriImg):
     # Compute the pose of the original image
     P1, B1 = compute_pose(oriImg)
 
+    aux = util.draw_pose_from_map(B1)[0]
+    plt.imshow(aux)
+    plt.show()
+
     # Initialize the model
     random_pose_dataset, gen_model = create_generative_model()
 
@@ -107,6 +111,8 @@ def compute_new_image(oriImg):
     B2 = compute_random_pose(random_pose_dataset)
 
     # Compute the final image
-    P2 = apply_generative_model(gen_model, P1, B1, B2)
+    #P2 = apply_generative_model(gen_model, P1, B1, B2)
 
-    return P2
+    #return P2
+
+    return P1

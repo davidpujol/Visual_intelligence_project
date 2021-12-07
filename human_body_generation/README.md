@@ -1,65 +1,11 @@
 # Pose-Transfer
 Code for the paper **Progressive Pose Attention for Person Image Generation** in **CVPR19(Oral)**. The paper is available [here](http://arxiv.org/abs/1904.03349). 
 
-<p float="center">
-	<img src='imgs/women1.jpg' width="100"/>
-  	<img src='imgs/walkfront.gif' width="100"/>
-  	<img src='imgs/women2.jpg' width="100"/>
-	<img src='imgs/dance.gif' width="100"/>
-	<img src='imgs/women3.jpg' width="100"/>
-    <img src='imgs/dance2.gif' width="100"/>
-    <img src='imgs/women4.jpg' width="100"/>
-    <img src='imgs/dance3.gif' width="100"/>
-</p>
+## Download checkpoints and models
+In order to download all the required pre-trained models and checkpoints, just download this [zip file](https://docs.google.com/uc?export=download&id=1KRPKheU6i5pCoAcBpI8RvnIMnmMYNIEm), and unzip it under the *human_body_generation* directory.
 
-Video generation with a single image as input. More details can be found in the supplementary materials in our [paper](http://arxiv.org/abs/1904.03349).
+## Alternative data preparation
 
-
-<!-- <figure class="fourth">
-	<img src='imgs/walkfront.gif' width="100"/>
-	<img src='imgs/dance.gif' width="100"/>
-    <img src='imgs/dance2.gif' width="100"/>
-    <img src='imgs/dance3.gif' width="100"/>
-</figure> -->
-
-<!-- <img src='imgs/walkfront.gif' width=100>
-<img src='imgs/dance.gif' width=100> -->
-
-## News 
-- We have released a new branch **PATN_Fine**. We introduce a segment-based skip-connection and a novel segment-based style loss, achieving even better results on DeepFashion.
-- [Video demo](https://youtu.be/bNHFPMX9BVk) is available now. We further improve the performance of our model by introducing a segment-based skip-connection. We will release the code soon. Refer to our [supplementary materials](http://arxiv.org/abs/1904.03349) for more details. 
-- Codes for pytorch 1.0 is available now under the branch **pytorch_v1.0**. The same results on both datasets can be reproduced with the pretrained model. 
-
-### Notes:
-In pytorch 1.0, **running_mean** and **running_var** are not saved for the **Instance Normalization layer** by default. To reproduce our result in the paper, launch ``python tool/rm_insnorm_running_vars.py`` to remove corresponding keys in the pretrained model. (Only for the DeepFashion dataset.)
-
-
-<img src='imgs/results.png' width=800>
-
-This is Pytorch implementation for pose transfer on both Market1501 and DeepFashion dataset. The code is written by [Tengteng Huang](https://github.com/tengteng95) and [Zhen Zhu](https://github.com/jessemelpolio).
-
-## Requirement
-* pytorch(0.3.1)
-* torchvision(0.2.0)
-* numpy
-* scipy
-* scikit-image
-* pillow
-* pandas
-* tqdm
-* dominate
-
-
-## Getting Started
-### Installation
-
-- Clone this repo:
-```bash
-git clone https://github.com/tengteng95/Pose-Transfer.git
-cd Pose-Transfer
-```
-
-### Data Preperation
 We provide our **dataset split files** and **extracted keypoints files** for convience.
 
 #### Market1501
@@ -111,32 +57,31 @@ python2 tool/create_pairs_dataset.py
 
 OR you can download our generated pose estimations from here. (Coming soon.) --> 
 
-### Train a model
+## Train a model
 Market-1501
 ```bash
-#python train.py --dataroot ./market_data/ --name market_PATN --model PATN --lambda_GAN 5 --lambda_A 10  --lambda_B 10 --dataset_mode keypoint --no_lsgan --n_layers 3 --norm batch --batchSize 32 --resize_or_crop no --gpu_ids -1 --BP_input_nc 18 --no_flip --which_model_netG PATN --niter 500 --niter_decay 200 --checkpoints_dir ./checkpoints --pairLst ./market_data/market-pairs-train.csv --L1_type l1_plus_perL1 --n_layers_D 3 --with_D_PP 1 --with_D_PB 1  --display_id 0
 python train.py
 ```
 
 DeepFashion
 ```bash
-python train.py --dataroot ./fashion_data/ --name fashion_PATN --model PATN --lambda_GAN 5 --lambda_A 1 --lambda_B 1 --dataset_mode keypoint --n_layers 3 --norm instance --batchSize 7 --pool_size 0 --resize_or_crop no --gpu_ids 0 --BP_input_nc 18 --no_flip --which_model_netG PATN --niter 500 --niter_decay 200 --checkpoints_dir ./checkpoints --pairLst ./fashion_data/fasion-resize-pairs-train.csv --L1_type l1_plus_perL1 --n_layers_D 3 --with_D_PP 1 --with_D_PB 1  --display_id 0
+python train.py 
 ```
 
 
-### Test the model
+## Test the model
 Market1501
 ```bash
-python test.py --dataroot ./market_data/ --name market_PATN --model PATN --phase test --dataset_mode keypoint --norm batch --batchSize 1 --resize_or_crop no --gpu_ids -1 --BP_input_nc 18 --no_flip --which_model_netG PATN --checkpoints_dir ./checkpoints --pairLst ./market_data/market-pairs-test.csv --which_epoch latest --results_dir ./results --display_id 0 --how_many 20
+python test.py 
 ```
 
 
 DeepFashion
 ```bash
-python test.py --dataroot ./fashion_data/ --name fashion_PATN --model PATN --phase test --dataset_mode keypoint --norm instance --batchSize 1 --resize_or_crop no --gpu_ids -1 --BP_input_nc 18 --no_flip --which_model_netG PATN --checkpoints_dir ./checkpoints --pairLst ./fashion_data/fasion-resize-pairs-test.csv --which_epoch latest --results_dir ./results --display_id 0
+python test.py 
 ```
 
-### Evaluation
+## Evaluation
 We adopt SSIM, mask-SSIM, IS, mask-IS, DS, and PCKh for evaluation of Market-1501. SSIM, IS, DS, PCKh for DeepFashion.
 
 #### 1) SSIM and mask-SSIM, IS and mask-IS, mask-SSIM
@@ -187,23 +132,9 @@ python2 compute_coordinates.py
 ```
 - run ``tool/calPCKH_fashion.py`` or ``tool/calPCKH_market.py``
 
-
-
 ### Pre-trained model 
 Our pre-trained model can be downloaded [Google Drive](https://drive.google.com/open?id=1YMsYXc41dR3k8YroXeWGh9zweNUQmZBw) or [Baidu Disk](https://pan.baidu.com/s/1fcMwXTUk9XKPLpaJSodTrg).
 
 
-## Citation
-If you use this code for your research, please cite our paper.
-```
-@inproceedings{zhu2019progressive,
-  title={Progressive Pose Attention Transfer for Person Image Generation},
-  author={Zhu, Zhen and Huang, Tengteng and Shi, Baoguang and Yu, Miao and Wang, Bofei and Bai, Xiang},
-  booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
-  pages={2347--2356},
-  year={2019}
-}
-```
-
-### Acknowledgments
+## Acknowledgments
 Our code is based on the popular [pytorch-CycleGAN-and-pix2pix](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix).

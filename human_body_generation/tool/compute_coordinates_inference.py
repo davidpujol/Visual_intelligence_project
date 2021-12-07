@@ -7,7 +7,7 @@ from skimage.transform import resize
 from scipy.ndimage import gaussian_filter
 import torch
 
-pose_estimation_model_path = './checkpoints/pose_estimator.h5'
+pose_estimation_model_path = './human_body_generation/checkpoints/pose_estimator.h5'
 model = tf.keras.models.load_model(pose_estimation_model_path)
 
 
@@ -222,7 +222,8 @@ def compute_pose_estimation(oriImg):
 
     # Compute pose map
     #pose_cords = np.concatenate([np.expand_dims(pose_cords[:, 1], -1), np.expand_dims(pose_cords[:, 0], -1)], axis=1)
-    img_size = (128, 64)
+    #img_size = (128, 64)
+    img_size = oriImg.shape[:-1]
     pose_map = cords_to_map(pose_cords, img_size)
 
 
