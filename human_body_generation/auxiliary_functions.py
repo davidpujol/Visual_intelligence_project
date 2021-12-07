@@ -110,8 +110,9 @@ def compute_new_image(oriImg):
     B2 = compute_random_pose(random_pose_dataset)
 
     # Compute the final image
-    #P2 = apply_generative_model(gen_model, P1, B1, B2)
+    print(P1.shape)
+    print(B1.shape)
+    print(B2.shape)
+    P2 = apply_generative_model(gen_model, P1, B1, B2)
 
-    #return P2
-
-    return P1
+    return P2

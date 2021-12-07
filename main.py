@@ -31,9 +31,11 @@ new_images = []
 
 # Discard the first one since it contains the full image
 for person_img in person_images[1:]:
-    #plt.imshow(person_img.data)
-    #plt.show()
+    plt.imshow(person_img.data)
+    plt.show()
     person_img = np.asarray(person_img.data)
+
+    # Problem: The new pose may not be of the size as the new image. Thus, we need to reshape it!!
     output_img = human_body_generation.compute_new_image(person_img)
     plt.imshow(output_img)
     plt.show()
