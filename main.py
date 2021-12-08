@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 import sys
-
 sys.path.append('./human_body_generation')
+
 # This file attempts to create the final pipeline for the project "Object substitution in RGB images"
 
 
@@ -13,9 +13,9 @@ sys.path.append('./human_body_generation')
 seg_model = create_model()
 
 # Define the input path
-img_path = os.path.abspath('./segmentation/input/image1.jpg')
-#img_path = os.path.abspath('./human_body_generation/test_inference_img/0002_c1s1_000551_01.jpg')
-threshold = 0.965
+#img_path = os.path.abspath('./segmentation/input/image1.jpg')
+img_path = os.path.abspath('./human_body_generation/test_inference_img/0002_c1s1_000551_01.jpg')
+threshold = 0.9#0.965
 
 # Segment the image
 orig_image, masks, boxes, labels = process_image(image_path=img_path, threshold=threshold, model= seg_model)
@@ -29,8 +29,11 @@ person_images = bbox_per_person(orig_image, boxes, labels)
 # Create the new image for each of the detected human bodies
 new_images = []
 
+# This is the final image with all the people masked out (on which we will paste the new images)
+output_image = None
+
 # Discard the first one since it contains the full image
-for person_img in person_images[1:]:
+for person_img in person_images:
     plt.imshow(person_img.data)
     plt.show()
     person_img = np.asarray(person_img.data)
@@ -41,4 +44,13 @@ for person_img in person_images[1:]:
     plt.show()
     new_images.append(output_img)
 
-# Fuse the new images with the in-painted image
+
+    # Segmentation of the newly generated person
+    mask = None
+
+
+    # Fuse the new person into the output image (with all the people segemented out)
+    # Basically, for now, paste the new person in its original bounding box
+
+
+# Do the final impainting
