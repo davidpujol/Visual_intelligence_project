@@ -12,6 +12,7 @@ import DeepFillv2.network as network
 #        Initialize the parameters
 # ----------------------------------------
 def init():
+
     parser = argparse.ArgumentParser()
     # General parameters
     parser.add_argument('--results_path', type=str, default='./results', help='testing samples path that is a folder')
@@ -56,10 +57,9 @@ def check_path(path):
 
 def save_img(opt, img_copy):
     # Save to certain path
-    save_img_name = 'result_' + opt.image.split('/')[-1].split('.')[0] + '.png'
+    save_img_name = './background/background.png'
 
-    save_img_path = os.path.join(opt.results_path, save_img_name)
-    cv2.imwrite(save_img_path, img_copy)
+    cv2.imwrite(save_img_name, img_copy)
 
 ## for contextual attention
 
@@ -140,11 +140,11 @@ def reduce_sum(x, axis=None, keepdim=False):
 
 def concat_masks(masks):
     tot_mask = masks[0]
-    print(tot_mask, flush=True)
+
     if len(masks) == 1:
-        return tot_mask
+        return tot_mask.astype(np.float32) * 255
 
     for m in masks[1:]:
         tot_mask = tot_mask | m
 
-    return tot_mask.astype(np.float32) * 255
+    return tot_mask.astype(np.uint8) * 255

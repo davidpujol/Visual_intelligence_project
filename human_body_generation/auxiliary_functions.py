@@ -1,17 +1,16 @@
 import os
-from human_body_generation.options.test_options import TestOptions
-from human_body_generation.data_processing.data_loader import CreateDataLoader
-from human_body_generation.models.models import create_model
-from human_body_generation.tool.compute_coordinates_inference import compute_pose_estimation
+from .options.test_options import TestOptions
+from .data_processing.data_loader import CreateDataLoader
+from .models.models import create_model
+from .tool.compute_coordinates_inference import compute_pose_estimation
 #from util.visualizer import Visualizer
 from skimage.io import imread
 import matplotlib.pyplot as plt
 import torch
-import human_body_generation.util.util as util
-from human_body_generation.data_processing.base_dataset import BaseDataset, get_transform
+from .util import util
+from .data_processing.base_dataset import BaseDataset, get_transform
 from PIL import Image
 import numpy as np
-
 
 # Prepare the options
 def set_options_inference():
@@ -111,8 +110,9 @@ def compute_new_image(oriImg):
     B2 = compute_random_pose(random_pose_dataset)
 
     # Compute the final image
-    #P2 = apply_generative_model(gen_model, P1, B1, B2)
+    print(P1.shape)
+    print(B1.shape)
+    print(B2.shape)
+    P2 = apply_generative_model(gen_model, P1, B1, B2)
 
-    #return P2
-
-    return P1
+    return P2

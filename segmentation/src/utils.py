@@ -56,17 +56,23 @@ def get_outputs(image, model, threshold):
     
     # get all the scores
     scores = list(outputs[0]['scores'].detach().cpu().numpy())
+
     # index of those scores which are above a certain threshold
     thresholded_preds_inidices = [scores.index(i) for i in scores if i > threshold]
     thresholded_preds_count = len(thresholded_preds_inidices)
+
     # get the masks
     masks = (outputs[0]['masks']>0.5).squeeze().detach().cpu().numpy()
+
     # discard masks for objects which are below threshold
     masks = masks[:thresholded_preds_count]
+
     # get the bounding boxes, in (x1, y1), (x2, y2) format
     boxes = [[(int(i[0]), int(i[1])), (int(i[2]), int(i[3]))]  for i in outputs[0]['boxes'].detach().cpu()]
+
     # discard bounding boxes below threshold value
     boxes = boxes[:thresholded_preds_count]
+
     # get the classes labels
     labels = [coco_names[i] for i in outputs[0]['labels']]
     return masks, boxes, labels
@@ -101,9 +107,11 @@ def bbox_per_person(image, bboxs, labels):
     person_bboxs = []
     person_images = []
     person_images.append(image)
+
     for i in range(len(bboxs)):
         if labels[i] == 'person':
             person_bboxs.append(bboxs[i])
+
     for box in person_bboxs:
         crop = image[box[0][1]:box[1][1],box[0][0]:box[1][0],:]
         person_images.append(crop)

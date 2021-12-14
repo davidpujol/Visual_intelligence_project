@@ -13,10 +13,11 @@ from DeepFillv2.data import Data
 
 def impaint(image, mask):
 
+    opt = utils.init()
 
     def load_model_generator(net, epoch, opt):
         model_name = 'deepfillv2_WGAN_G_epoch%d_batchsize%d.pth' % (epoch, 4)
-        model_name = os.path.join('pretrained_model', model_name)
+        model_name = os.path.join('DeepFillv2/pretrained_model', model_name)
         pretrained_dict = torch.load(model_name, map_location=torch.device('cpu'))
         generator.load_state_dict(pretrained_dict)
 
@@ -28,6 +29,11 @@ def impaint(image, mask):
     if not os.path.exists(opt.results_path):
         os.makedirs(opt.results_path)
 
+    cv2_img = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+
+    cv2_mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
+
+    print(cv2_mask, flush=True)
     # Build networks
     generator = utils.create_generator(opt).eval()
     print('-------------------------Loading Pretrained Model-------------------------')
@@ -41,7 +47,7 @@ def impaint(image, mask):
     #       Initialize training dataset
     # ----------------------------------------
 
-    dataset = Data(opt)
+    dataset = Data(opt, cv2_img, cv2_mask)
     
     # Define the dataloader
     dataloader = DataLoader(dataset, batch_size = opt.batch_size, shuffle = False, num_workers = opt.num_workers, pin_memory = True)
@@ -73,6 +79,7 @@ def impaint(image, mask):
 
         utils.save_img(opt, img_copy)
 
+        print(img_copy)
         print("-------------------------Impainting done-------------------------", flush=True)
 
         return img_copy

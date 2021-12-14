@@ -8,7 +8,7 @@ import numpy as np
 import torch.nn.functional as F
 
 import sys
-from human_body_generation.models.model_variants import PATNetwork
+from .model_variants import PATNetwork
 
 def weights_init_normal(m):
     classname = m.__class__.__name__
