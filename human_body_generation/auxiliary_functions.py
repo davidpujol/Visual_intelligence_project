@@ -11,6 +11,7 @@ from .util import util
 from .data_processing.base_dataset import BaseDataset, get_transform
 from PIL import Image
 import numpy as np
+import torch.nn.functional as F
 
 # Prepare the options
 def set_options_inference():
@@ -108,11 +109,19 @@ def compute_new_image(oriImg):
 
     # Compute the new target pose
     B2 = compute_random_pose(random_pose_dataset)
-
+    aux = util.draw_pose_from_map(B2)[0]
+    plt.imshow(aux)
+    plt.show()
+    B2 = F.interpolate(B2, size=(B1.shape[2], B1.shape[3]))
+    # B2 = B2.resize_(1, 18, B1.shape[2], int(B1.shape[2]/B2.shape[2]*B2.shape[3]))
+    aux = util.draw_pose_from_map(B2)[0]
+    plt.imshow(aux)
+    plt.show()
     # Compute the final image
     print(P1.shape)
     print(B1.shape)
     print(B2.shape)
+
     P2 = apply_generative_model(gen_model, P1, B1, B2)
 
     return P2
