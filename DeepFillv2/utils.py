@@ -5,7 +5,7 @@ import cv2
 import torch
 import torch.nn as nn
 import torchvision as tv
-
+from impaint import impaint
 import DeepFillv2.network as network
 
 # ----------------------------------------
@@ -148,3 +148,10 @@ def concat_masks(masks):
         tot_mask = tot_mask | m
 
     return tot_mask.astype(np.uint8) * 255
+
+def impainting(image, masks, i):
+    full_mask = concat_masks(masks)
+    cv2.imwrite('masks/' + str(i) + '.png', masks[2].astype(np.uint8) * 255)
+    bg = impaint(image, masks[2].astype(np.uint8) * 255)
+
+    return bg

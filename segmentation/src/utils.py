@@ -192,3 +192,4 @@ def draw_segmentation_map(image, masks, boxes, labels):
                     thickness=2, lineType=cv2.LINE_AA)
     
     return image
+
