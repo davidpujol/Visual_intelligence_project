@@ -7,7 +7,7 @@ import torchvision
 from PIL import Image
 from torchvision.transforms import transforms as transforms
 
-from segmentation.src.coco_names import COCO_INSTANCE_CATEGORY_NAMES as coco_names
+from coco_names import COCO_INSTANCE_CATEGORY_NAMES as coco_names
 
 # this will help us create a different color for each class
 COLORS = np.random.uniform(0, 255, size=(len(coco_names), 3))
@@ -120,6 +120,38 @@ def bbox_per_person(image, bboxs, labels):
         person_images.append(crop)
 
     return person_images
+
+def seg_background(image, masks, labels):
+    
+    
+    color = np.array([255,255,255])
+    alpha = 1 
+    beta = 1# transparency for the segmentation map
+    gamma = 0 # scalar added to each sum
+    mask = np.zeros(masks[0].shape)
+    for i in range(len(masks)):
+        if labels[i] == 'person':
+            mask = np.logical_or(mask, masks[i])
+    
+    mask = ~mask
+
+
+    red_map = np.zeros_like(mask).astype(np.uint8)
+    green_map = np.zeros_like(mask).astype(np.uint8)
+    blue_map = np.zeros_like(mask).astype(np.uint8)
+    red_map[mask == 1], green_map[mask == 1], blue_map[mask == 1]  = color
+    segmentation_map = np.stack([red_map, green_map, blue_map], axis=2)
+
+    image = np.array(image)
+    # convert from RGN to OpenCV BGR format
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+    # apply mask on the image
+    cv2.addWeighted(image, alpha, segmentation_map, beta, gamma, image)
+
+    return image, ~mask*1
+
+
 
 def seg_per_person(image, masks, labels):
     color = np.array([255,255,255])
