@@ -5,13 +5,14 @@ import cv2
 import torch
 import torch.nn as nn
 import torchvision as tv
-
-import network
+from impaint import impaint
+import DeepFillv2.network as network
 
 # ----------------------------------------
 #        Initialize the parameters
 # ----------------------------------------
 def init():
+
     parser = argparse.ArgumentParser()
     # General parameters
     parser.add_argument('--results_path', type=str, default='./results', help='testing samples path that is a folder')
@@ -33,14 +34,8 @@ def init():
     parser.add_argument('--init_type', type=str, default='normal', help='the initialization type')
     parser.add_argument('--init_gain', type=float, default=0.02, help='the initialization gain')
 
-    #Images
-    parser.add_argument('--image', type=str, default='')
-    parser.add_argument('--mask', type=str, default='')
-
     opt = parser.parse_args()
 
-    if opt.image == '' or opt.mask == '':
-        raise ReferenceError("Wrong usage, use --image path/to/image --mask path/to/mask")
     return opt
 
 
@@ -62,10 +57,9 @@ def check_path(path):
 
 def save_img(opt, img_copy):
     # Save to certain path
-    save_img_name = 'result_' + opt.image.split('/')[-1].split('.')[0] + '.png'
+    save_img_name = './background/background.png'
 
-    save_img_path = os.path.join(opt.results_path, save_img_name)
-    cv2.imwrite(save_img_path, img_copy)
+    cv2.imwrite(save_img_name, img_copy)
 
 ## for contextual attention
 
@@ -139,3 +133,25 @@ def reduce_sum(x, axis=None, keepdim=False):
     for i in sorted(axis, reverse=True):
         x = torch.sum(x, dim=i, keepdim=keepdim)
     return x
+
+#----------------------------------
+#        Input processing
+#----------------------------------
+
+def concat_masks(masks):
+    tot_mask = masks[0]
+
+    if len(masks) == 1:
+        return tot_mask.astype(np.float32) * 255
+
+    for m in masks[1:]:
+        tot_mask = tot_mask | m
+
+    return tot_mask.astype(np.uint8) * 255
+
+def impainting(image, masks, i):
+    full_mask = concat_masks(masks)
+    cv2.imwrite('masks/' + str(i) + '.png', masks[2].astype(np.uint8) * 255)
+    bg = impaint(image, masks[2].astype(np.uint8) * 255)
+
+    return bg

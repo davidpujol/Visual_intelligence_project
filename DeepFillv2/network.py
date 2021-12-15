@@ -1,7 +1,7 @@
 import torch.nn.init as init
 import torchvision
 
-from network_module import *
+from DeepFillv2.network_module import *
 
 
 def weights_init(net, init_type = 'kaiming', init_gain = 0.02):

@@ -1,5 +1,6 @@
-from segmentation.src.utils import create_model, process_image, bbox_per_person, seg_person, seg_per_person
+from segmentation.src.utils import create_model, process_image, bbox_per_person
 import human_body_generation.auxiliary_functions as human_body_generation
+import DeepFillv2 as df
 import matplotlib.pyplot as plt
 import os
 import numpy as np
@@ -22,6 +23,7 @@ threshold = 0.9#0.965
 orig_image, masks, boxes, labels = process_image(image_path=img_path, threshold=threshold, model= seg_model)
 
 # Produce the new image in-painted by calling module 2
+bg = df.utils.impainting(orig_image, masks, -1)
 
 
 # Created the zoomed image for each of the human bodies in the image
@@ -34,7 +36,12 @@ new_images = []
 # output_image = seg_person(orig_image, boxes, labels)
 
 # Discard the first one since it contains the full image
+
+#For visualisation purpose
+i = 0
 for person_img in person_images[2:3]:
+    i += 1
+
     plt.imshow(person_img.data)
     plt.show()
     person_img = np.asarray(person_img.data)
@@ -49,13 +56,14 @@ for person_img in person_images[2:3]:
     plt.show()
 
     orig_image, masks, boxes, labels = process_image(image_path=save_dir, threshold=threshold, model= seg_model)
-    person_image_masked = seg_person(orig_image, masks, labels)
-    cv2.imshow('Segmented image', person_image_masked)
+    # TODO: remove comment when function is back
+    #person_image_masked = seg_person(orig_image, masks, labels)
+    #cv2.imshow('Segmented image', person_image_masked)
     cv2.waitKey(0)
 
 
 # Produce the new image in-painted by calling module 2
-
+    bg = df.utils.impainting(orig_image, masks, i)
 
 # Created the zoomed image for each of the human bodies in the image
 
@@ -71,6 +79,5 @@ for person_img in person_images[2:3]:
 
     # Fuse the new person into the output image (with all the people segemented out)
     # Basically, for now, paste the new person in its original bounding box
-
 
 # Do the final impainting
