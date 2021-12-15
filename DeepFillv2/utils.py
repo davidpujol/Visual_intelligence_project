@@ -5,7 +5,7 @@ import cv2
 import torch
 import torch.nn as nn
 import torchvision as tv
-from impaint import impaint
+from .impaint import impaint
 import DeepFillv2.network as network
 
 # ----------------------------------------
@@ -22,7 +22,7 @@ def init():
     # Training parameters
     parser.add_argument('--epoch', type=int, default=40, help='number of epochs of training')
     parser.add_argument('--batch_size', type=int, default=1, help='size of the batches')
-    parser.add_argument('--num_workers', type=int, default=8,
+    parser.add_argument('--num_workers', type=int, default=1,#8,
                         help='number of cpu threads to use during batch generation')
     # Network parameters
     parser.add_argument('--in_channels', type=int, default=4, help='input RGB image + 1 channel mask')
@@ -149,9 +149,9 @@ def concat_masks(masks):
 
     return tot_mask.astype(np.uint8) * 255
 
-def impainting(image, masks, i):
+def impainting(image, masks, i, use_gpu=True):
     full_mask = concat_masks(masks)
     cv2.imwrite('masks/' + str(i) + '.png', masks[2].astype(np.uint8) * 255)
-    bg = impaint(image, masks[2].astype(np.uint8) * 255)
+    bg = impaint(image, masks[2].astype(np.uint8) * 255, use_gpu=use_gpu)
 
     return bg

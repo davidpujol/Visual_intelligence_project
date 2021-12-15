@@ -11,7 +11,7 @@ import DeepFillv2.utils as utils
 from DeepFillv2.data import Data
 
 
-def impaint(image, mask):
+def impaint(image, mask, use_gpu=True):
 
     opt = utils.init()
 
@@ -41,7 +41,8 @@ def impaint(image, mask):
     print('-------------------------Pretrained Model Loaded-------------------------')
 
     # To device
-    generator = generator.cuda()
+    if use_gpu:
+        generator = generator.cuda()
 
     # ----------------------------------------
     #       Initialize training dataset
@@ -50,14 +51,15 @@ def impaint(image, mask):
     dataset = Data(opt, cv2_img, cv2_mask)
     
     # Define the dataloader
-    dataloader = DataLoader(dataset, batch_size = opt.batch_size, shuffle = False, num_workers = opt.num_workers, pin_memory = True)
+    dataloader = DataLoader(dataset, batch_size = opt.batch_size, shuffle = False, pin_memory = True)#, num_workers = opt.num_workers)
     
     for batch_id, (data_img, data_mask) in enumerate(dataloader):
         img = data_img
         mask = data_mask
 
-        img = img.cuda()
-        mask = mask.cuda()
+        if use_gpu:
+            img = img.cuda()
+            mask = mask.cuda()
 
         # Generator output
         with torch.no_grad():

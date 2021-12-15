@@ -99,7 +99,7 @@ if __name__ == '__main__':
     dataset = data_loader.load_dataset()
 
     # read the corresponding images
-    img_path = os.path.abspath('./test_inference_img/0002_c1s1_000451_03.jpg')
+    img_path = os.path.abspath('./test_inference_img/image1.jpg')
     output_path = os.path.abspath('./')
     img1, pose1 = load_img(img_path, transform)
 

@@ -16,7 +16,7 @@ from torchsr.datasets import Div2K
 #sys.exit()
 
 
-#image_path = '../human_body_generation/test_inference_img/0002_c1s1_000551_01.jpg'
+#image_path = '../human_body_generation/test_inference_img/image2.jpg'
 image_path = '../human_body_generation/test_inference_img/butterfly.png'
 #image_path = './data/DIV2K/DIV2K_train_LR_bicubic/X2/0001x2.png'
 image = Image.open(image_path).convert('RGB')
