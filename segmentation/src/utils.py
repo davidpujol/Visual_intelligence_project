@@ -24,9 +24,12 @@ def create_model():
 
 # This function takes as input the path of an image, the threshold and the model. Then, it produces its mask, boounding boxes, and labels
 def process_image(image_path, threshold, model):
+    
+
     image = Image.open(image_path).convert('RGB')
     # keep a copy of the original image for OpenCV functions and applying masks
     orig_image = image.copy()
+    print(type(image))
 
     # transform to convert the image to tensor
     transform = transforms.Compose([
@@ -76,7 +79,7 @@ def get_outputs(image, model, threshold):
     labels = [coco_names[i] for i in outputs[0]['labels']]
     return masks, boxes, labels
 
-def split_person(image, masks, labels):
+def seg_person(image, masks, labels):
 
     color = np.array([255,255,255])
     alpha = 1 
@@ -117,7 +120,7 @@ def bbox_per_person(image, bboxs, labels):
 
     return person_images
 
-def split_per_person(image, masks, labels):
+def seg_per_person(image, masks, labels):
     color = np.array([255,255,255])
     alpha = 1 
     beta = 1# transparency for the segmentation map
