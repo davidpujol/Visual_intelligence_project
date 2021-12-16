@@ -7,7 +7,7 @@ import torchvision
 from PIL import Image
 from torchvision.transforms import transforms as transforms
 
-from coco_names import COCO_INSTANCE_CATEGORY_NAMES as coco_names
+from .coco_names import COCO_INSTANCE_CATEGORY_NAMES as coco_names
 
 # this will help us create a different color for each class
 COLORS = np.random.uniform(0, 255, size=(len(coco_names), 3))
@@ -25,8 +25,6 @@ def create_model():
 
 # This function takes as input the path of an image, the threshold and the model. Then, it produces its mask, boounding boxes, and labels
 def process_image(image_path, threshold, model):
-    
-
     image = Image.open(image_path).convert('RGB')
     # keep a copy of the original image for OpenCV functions and applying masks
     orig_image = image.copy()
@@ -45,8 +43,10 @@ def process_image(image_path, threshold, model):
 
     # transform the image
     image = transform(image)
+
     # add a batch dimension
     image = image.unsqueeze(0).to(device)
+
     masks, boxes, labels = get_outputs(image, model, threshold)
 
     return orig_image, masks, boxes, labels
@@ -81,7 +81,6 @@ def get_outputs(image, model, threshold):
     return masks, boxes, labels
 
 def seg_person(image, masks, labels):
-
     color = np.array([255,255,255])
     alpha = 1 
     beta = 1# transparency for the segmentation map
@@ -96,6 +95,7 @@ def seg_person(image, masks, labels):
         segmentation_map = np.stack([red_map, green_map, blue_map], axis=2)
 
         image = np.array(image)
+
         # convert from RGN to OpenCV BGR format
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
@@ -119,11 +119,9 @@ def bbox_per_person(image, bboxs, labels):
         crop = image[box[0][1]:box[1][1],box[0][0]:box[1][0],:]
         person_images.append(crop)
 
-    return person_images
+    return person_images, person_bboxs
 
 def seg_background(image, masks, labels):
-    
-    
     color = np.array([255,255,255])
     alpha = 1 
     beta = 1# transparency for the segmentation map
@@ -134,7 +132,6 @@ def seg_background(image, masks, labels):
             mask = np.logical_or(mask, masks[i])
     
     mask = ~mask
-
 
     red_map = np.zeros_like(mask).astype(np.uint8)
     green_map = np.zeros_like(mask).astype(np.uint8)
