@@ -91,7 +91,6 @@ for person_img, person_box in list(zip(person_images, person_boxes))[0:]:
     
     plt.imshow(person_image_masked)
     plt.show()
-    quit()
 
     print("GENERATED MASK")
     print(seg_mask.shape)
