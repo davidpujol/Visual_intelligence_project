@@ -6,6 +6,7 @@ import torch
 import torchvision
 from PIL import Image
 from torchvision.transforms import transforms as transforms
+import matplotlib.pyplot as plt
 
 from .coco_names import COCO_INSTANCE_CATEGORY_NAMES as coco_names
 
@@ -24,11 +25,19 @@ def create_model():
     return model
 
 # This function takes as input the path of an image, the threshold and the model. Then, it produces its mask, boounding boxes, and labels
-def process_image(image_path, threshold, model):
+def process_image(image_path, threshold, model, image_type=None):
     image = Image.open(image_path).convert('RGB')
+    w, h = image.size
+    if image_type is not None:
+        bg = Image.new(image.mode, (w+100, h+100), (255, 255, 255))
+
+        bg.paste(image, (50, 50))
+        image = bg
+    plt.imshow(image)
+    plt.show()
     # keep a copy of the original image for OpenCV functions and applying masks
     orig_image = image.copy()
-    print(type(image))
+    print(np.array(image).shape)
 
     # transform to convert the image to tensor
     transform = transforms.Compose([
@@ -46,6 +55,7 @@ def process_image(image_path, threshold, model):
 
     # add a batch dimension
     image = image.unsqueeze(0).to(device)
+    print("process image shape: " +str(image.shape))
 
     masks, boxes, labels = get_outputs(image, model, threshold)
 

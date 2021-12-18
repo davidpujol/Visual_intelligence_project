@@ -19,7 +19,7 @@ seg_model = create_model()
 # Define the input path
 #img_path = os.path.abspath('./segmentation/input/image1.jpg')
 img_path = os.path.abspath('./human_body_generation/test_inference_img/image1.jpg')
-threshold = 0.8#0.965
+threshold = 0.9#0.965
 
 # Segment the image
 orig_image, masks, boxes, labels = process_image(image_path=img_path, threshold=threshold, model= seg_model)
@@ -57,28 +57,41 @@ for person_img, person_box in list(zip(person_images, person_boxes))[0:]:
     gen_img = human_body_generation.compute_new_image(person_img)
     print("GENERATED IMAGE")
     plt.imshow(gen_img)
-    plt.show()
+
     save_dir = './human_body_generation/test_generated_image/image1' + '_generated'+'.jpg'
 
     # CHECK THIS! RIGHT NOW THE SEGMENTATION IS NOT DONE VERY WELL SINCE THE IMAGE IS TOO SMALL??
-    #plt.savefig(save_dir)
+    # plt.savefig(save_dir)
+    # resized = cv2.resize(gen_img, (int(gen_img.shape[1]*1.5), int(gen_img.shape[0]*1.5)), interpolation = cv2.INTER_AREA)
+
     img_to_save = Image.fromarray(gen_img)
     img_to_save.save(save_dir)
-
+    plt.show()
 
     print("SHAPE OF THE IMAGE BEFORE PROCESSING")
-    print(gen_img.shape)
-    generated_image, masks, gen_boxes, labels = process_image(image_path=save_dir, threshold=threshold, model= seg_model)
-
+    # print(resized.shape)
+    # orig_image_shape = resized.shape
+    gen_img_shape = gen_img.shape
+    generated_image, masks, gen_boxes, labels = process_image(image_path=save_dir, threshold=threshold, model= seg_model, image_type='gen')
     # TODO: remove comment when function is back
     print("SHAPE OF THE IMAGE AFTER PROCESSING")
     # Problem: Sometimes the number of masks is empty!!
 
     person_image_masked, seg_mask = seg_background(generated_image, masks, labels)
+    x = int(np.array(person_image_masked).shape[0]/2)
+    y = int(np.array(person_image_masked).shape[1]/2)
+    orig_width = int(gen_img_shape[0]/2)
+    orig_length = int(gen_img_shape[1]/2)
+    print(x, y, orig_width, orig_length)
+    person_image_masked = person_image_masked[x-orig_width:x+orig_width, y-orig_length:y+orig_length,:]
+    print(np.array(person_image_masked).shape)
+    print(gen_img_shape)
 
     print("GENERATED IMAGE SEGMENTED")
+    
     plt.imshow(person_image_masked)
     plt.show()
+    quit()
 
     print("GENERATED MASK")
     print(seg_mask.shape)
