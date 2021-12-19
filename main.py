@@ -86,6 +86,11 @@ for person_img, person_box in list(zip(person_images, person_boxes))[0:]:
     person_image_masked = person_image_masked[x-orig_width:x+orig_width, y-orig_length:y+orig_length,:]
     print(np.array(person_image_masked).shape)
     print(gen_img_shape)
+    print("SHAPE OF MASKS: ", masks.shape)
+
+    masks = masks[:, x-orig_width:x+orig_width, y-orig_length:y+orig_length]
+    print("SHAPE OF CROPPED MASKS: ", masks.shape)
+
 
     print("GENERATED IMAGE SEGMENTED")
     
