@@ -22,7 +22,7 @@ img_path = os.path.abspath('./human_body_generation/test_inference_img/image1.jp
 threshold = 0.9#0.965
 
 # Segment the image
-orig_image, masks, boxes, labels = process_image(image_path=img_path, threshold=threshold, model= seg_model)
+orig_image, masks, boxes, labels = process_image(image_path=img_path, threshold=0.5, model= seg_model)
 
 # Produce the new image in-painted by calling module 2
 #bg = df_utils.impainting(orig_image, masks, -1, use_gpu=True)
@@ -46,7 +46,7 @@ plt.show()
 # Discard the first one since it contains the full image
 #For visualisation purpose
 i = 0
-for person_img, person_box in list(zip(person_images, person_boxes))[0:]:
+for person_img, person_box in list(zip(person_images, person_boxes)):
     i += 1
     print("PERSON IMAGE:")
     plt.imshow(person_img.data)
@@ -82,18 +82,20 @@ for person_img, person_box in list(zip(person_images, person_boxes))[0:]:
     y = int(np.array(person_image_masked).shape[1]/2)
     orig_width = int(gen_img_shape[0]/2)
     orig_length = int(gen_img_shape[1]/2)
-    print(x, y, orig_width, orig_length)
+    #print(x, y, orig_width, orig_length)
     person_image_masked = person_image_masked[x-orig_width:x+orig_width, y-orig_length:y+orig_length,:]
+
     print(np.array(person_image_masked).shape)
     print(gen_img_shape)
     print("SHAPE OF MASKS: ", masks.shape)
-
-    masks = masks[:, x-orig_width:x+orig_width, y-orig_length:y+orig_length]
-    print("SHAPE OF CROPPED MASKS: ", masks.shape)
-
+    #masks = masks[:, x-orig_width:x+orig_width, y-orig_length:y+orig_length]
+    print(seg_mask.shape)
+    seg_mask = seg_mask[x-orig_width:x+orig_width, y-orig_length:y+orig_length]
+    #print(seg_mask.shape)
+    #seg_mask =
+    print("SHAPE OF CROPPED MASKS: ", seg_mask.shape)
 
     print("GENERATED IMAGE SEGMENTED")
-    
     plt.imshow(person_image_masked)
     plt.show()
 
@@ -114,6 +116,12 @@ for person_img, person_box in list(zip(person_images, person_boxes))[0:]:
     y_max, x_max = gen_boxes[0][1]
     height_box = x_max - x_min
     width_box = y_max - y_min
+
+    # Rescale the box (change this)
+    y_min -= (y - orig_length)
+    y_max -= (y - orig_length)
+    x_min -= (x - orig_width)
+    x_max -= (x - orig_width)
 
     indices_of_mask = [(i+x_min, j+y_min, c) for i in range(height_box+1) for j in range(width_box) for c in range(channels) if seg_mask[i+x_min][j+y_min]]
     # Create the expanded mask
@@ -139,7 +147,8 @@ for person_img, person_box in list(zip(person_images, person_boxes))[0:]:
     # Produce the new image in-painted by calling module 2
     #bg = df_utils.impainting(orig_image, masks, i, use_gpu=False)
 
-
+    
+    break
 
 
 
