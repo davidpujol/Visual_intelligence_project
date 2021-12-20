@@ -23,10 +23,8 @@ threshold = 0.9#0.965
 
 # Segment the image
 orig_image, masks, boxes, labels = process_image(image_path=img_path, threshold=0.5, model= seg_model)
-
-# Produce the new image in-painted by calling module 2
-#bg = df_utils.impainting(orig_image, masks, -1, use_gpu=True)
-
+tot_seg_mask = df_utils.concat_masks(masks)
+print(tot_seg_mask, flush=True)
 # Created the zoomed image for each of the human bodies in the image
 person_images, person_boxes = bbox_per_person(orig_image, boxes, labels)
 
@@ -34,28 +32,41 @@ person_images, person_boxes = bbox_per_person(orig_image, boxes, labels)
 new_images = []
 
 # This is the final image with all the people masked out (on which we will paste the new images)
-print("ORIGINAL IMAGE:")
+print("ORIGINAL IMAGE:", flush=True)
 plt.imshow(orig_image)
 plt.show()
 
 output_image = seg_person(orig_image, masks, labels)
-print("INITIAL OUTPUT IMAGE:")
+print("INITIAL OUTPUT IMAGE:", flush=True)
 plt.imshow(output_image)
 plt.show()
-    
+
+# Produce the new image in-painted by calling module 2
+'''
+print("impaint started", flush=True)
+bg = df_utils.impainting(output_image, masks, use_gpu=True)
+for m in masks:
+    plt.imshow(m)
+    plt.show()
+
+print("showing image", flush=True)
+plt.imshow(bg)
+plt.show()
+print("impaint done", flush=True)
+'''
 # Discard the first one since it contains the full image
 #For visualisation purpose
 i = 0
 for person_img, person_box in list(zip(person_images, person_boxes)):
     i += 1
-    print("PERSON IMAGE:")
+    print("PERSON IMAGE:", flush=True)
     plt.imshow(person_img.data)
     plt.show()
     person_img = np.asarray(person_img.data)
 
     # Problem: The new pose may not be of the size as the new image. Thus, we need to reshape it!!
     gen_img = human_body_generation.compute_new_image(person_img)
-    print("GENERATED IMAGE")
+    print("GENERATED IMAGE", flush=True)
     plt.imshow(gen_img)
 
     save_dir = './human_body_generation/test_generated_image/image1' + '_generated'+'.jpg'
@@ -68,13 +79,12 @@ for person_img, person_box in list(zip(person_images, person_boxes)):
     img_to_save.save(save_dir)
     plt.show()
 
-    print("SHAPE OF THE IMAGE BEFORE PROCESSING")
+    print("SHAPE OF THE IMAGE BEFORE PROCESSING", flush=True)
     # print(resized.shape)
     # orig_image_shape = resized.shape
     gen_img_shape = gen_img.shape
     generated_image, masks, gen_boxes, labels = process_image(image_path=save_dir, threshold=threshold, model= seg_model, image_type='gen')
-    # TODO: remove comment when function is back
-    print("SHAPE OF THE IMAGE AFTER PROCESSING")
+    print("SHAPE OF THE IMAGE AFTER PROCESSING", flush=True)
     # Problem: Sometimes the number of masks is empty!!
 
     person_image_masked, seg_mask = seg_background(generated_image, masks, labels)
@@ -85,22 +95,22 @@ for person_img, person_box in list(zip(person_images, person_boxes)):
     #print(x, y, orig_width, orig_length)
     person_image_masked = person_image_masked[x-orig_width:x+orig_width, y-orig_length:y+orig_length,:]
 
-    print(np.array(person_image_masked).shape)
-    print(gen_img_shape)
-    print("SHAPE OF MASKS: ", masks.shape)
+    print(np.array(person_image_masked).shape, flush=True)
+    print(gen_img_shape, flush=True)
+    print("SHAPE OF MASKS: ", masks.shape, flush=True)
     #masks = masks[:, x-orig_width:x+orig_width, y-orig_length:y+orig_length]
     print(seg_mask.shape)
     seg_mask = seg_mask[x-orig_width:x+orig_width, y-orig_length:y+orig_length]
     #print(seg_mask.shape)
     #seg_mask =
-    print("SHAPE OF CROPPED MASKS: ", seg_mask.shape)
+    print("SHAPE OF CROPPED MASKS: ", seg_mask.shape, flush=True)
 
-    print("GENERATED IMAGE SEGMENTED")
+    print("GENERATED IMAGE SEGMENTED", flush=True)
     plt.imshow(person_image_masked)
     plt.show()
 
-    print("GENERATED MASK")
-    print(seg_mask.shape)
+    print("GENERATED MASK", flush=True)
+    print(seg_mask.shape, flush=True)
     plt.imshow(seg_mask)
     plt.show()
 
@@ -124,12 +134,36 @@ for person_img, person_box in list(zip(person_images, person_boxes)):
     x_max -= (x - orig_width)
 
     indices_of_mask = [(i+x_min, j+y_min, c) for i in range(height_box+1) for j in range(width_box) for c in range(channels) if seg_mask[i+x_min][j+y_min]]
+    exp_mask_bw =  np.zeros((height, width))
     # Create the expanded mask
     for i,j,c in indices_of_mask:
         exp_mask[i][j][c] = 1
+        exp_mask_bw[i][j] = True
 
-    print("EXPANDED MASK")
+    exp_mask_bw = exp_mask_bw.astype(bool)
+    print("EXPANDED MASK", flush=True)
     plt.imshow(exp_mask)
+    plt.show()
+
+    # TODO: Create mask diff for impainting
+    plt.imshow(exp_mask_bw)
+    plt.show()
+    print(tot_seg_mask.shape == exp_mask_bw.shape)
+    diff_mask = tot_seg_mask
+    dim = tot_seg_mask.shape
+    print(exp_mask_bw, flush=True)
+    for i in range(dim[0]):
+        for j in range(dim[1]):
+            if diff_mask[i][j]:
+                if exp_mask_bw[i][j]:
+                    print((diff_mask[i][j], exp_mask_bw[i][j]), flush=True)
+                    diff_mask[i][j] = False
+                else:
+                    continue
+            else:
+                diff_mask[i][j] = False
+
+    plt.imshow(diff_mask)
     plt.show()
 
     # Fuse both images
@@ -140,13 +174,14 @@ for person_img, person_box in list(zip(person_images, person_boxes)):
                 if exp_mask[i][j][c]:
                     output_image[i][j][c] = gen_img[i][j][c]
 
-    print("FUSED IMAGE")
+    print("FUSED IMAGE", flush=True)
     plt.imshow(output_image)
     plt.show()
 
     # Produce the new image in-painted by calling module 2
-    #bg = df_utils.impainting(orig_image, masks, i, use_gpu=False)
-
+    finished = df_utils.impainting(output_image, [diff_mask], use_gpu=True)
+    plt.imshow(finished)
+    plt.show()
     
     break
 
