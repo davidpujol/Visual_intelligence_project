@@ -1,5 +1,7 @@
 import argparse
 import os
+
+import matplotlib.pyplot as plt
 import numpy as np
 import cv2
 import torch
@@ -140,18 +142,25 @@ def reduce_sum(x, axis=None, keepdim=False):
 
 def concat_masks(masks):
     tot_mask = masks[0]
+    cv2.imwrite('masks/' + str(0) + '.png', masks[0].astype(np.uint8) * 255)
 
     if len(masks) == 1:
-        return tot_mask.astype(np.float32) * 255
-
+        return tot_mask
+    i = 0
     for m in masks[1:]:
+        i += 1
+        print(i, flush=True)
+        cv2.imwrite('masks/' + str(i) + '.png', m.astype(np.uint8) * 255)
         tot_mask = tot_mask | m
+        plt.imshow(tot_mask)
+        plt.show()
 
-    return tot_mask.astype(np.uint8) * 255
+    return tot_mask
 
-def impainting(image, masks, i, use_gpu=True):
+
+def impainting(image, masks, use_gpu=True):
     full_mask = concat_masks(masks)
-    cv2.imwrite('masks/' + str(i) + '.png', masks[2].astype(np.uint8) * 255)
-    bg = impaint(image, masks[2].astype(np.uint8) * 255, use_gpu=use_gpu)
+    cv2.imwrite('masks/full.png', full_mask.astype(np.uint8) * 255)
+    bg = impaint(image, full_mask.astype(np.uint8) * 255, use_gpu=use_gpu)
 
     return bg
