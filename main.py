@@ -1,6 +1,6 @@
 from segmentation.src.utils import create_model, process_image, bbox_per_person, seg_person, seg_background
 import human_body_generation.auxiliary_functions as human_body_generation
-from DeepFillv2  import utils as df_utils
+from DeepFillv2 import utils as df_utils
 import matplotlib.pyplot as plt
 import os
 import numpy as np
@@ -8,101 +8,6 @@ import sys
 import cv2
 from PIL import Image
 sys.path.append('./human_body_generation')
-
-'''
-# This file attempts to create the final pipeline for the project "Object substitution in RGB images"
-
-
-# Create the segmentation model
-seg_model = create_model()
-
-# Define the input path
-#img_path = os.path.abspath('./segmentation/input/image1.jpg')
-img_path = os.path.abspath('./human_body_generation/test_inference_img/test_image_3.jpg')
-threshold = 0.9#0.965
-
-# Segment the image
-orig_image, masks, boxes, labels = process_image(image_path=img_path, threshold=0.5, model= seg_model)
-
-y_min, x_min = boxes[0][0]
-y_max, x_max = boxes[0][1]
-height_box = x_max - x_min
-width_box = y_max - y_min
-
-# Rescale the box (change this)
-y_min -= (y - orig_length)
-y_max -= (y - orig_length)
-x_min -= (x - orig_width)
-x_max -= (x - orig_width)
-
-indices_of_mask = [(i+x_min, j+y_min, c) for i in range(height_box+1) for j in range(width_box) for c in range(channels) if seg_mask[i+x_min][j+y_min]]
-exp_mask_bw =  np.zeros((height, width))
-# Create the expanded mask
-for i,j,c in indices_of_mask:
-    exp_mask_bw[i][j] = True
-
-tot_seg_mask = df_utils.concat_masks(masks)
-print(tot_seg_mask, flush=True)
-# Created the zoomed image for each of the human bodies in the image
-person_images, person_boxes = bbox_per_person(orig_image, boxes, labels)
-
-# Create the new image for each of the detected human bodies
-new_images = []
-
-# This is the final image with all the people masked out (on which we will paste the new images)
-print("ORIGINAL IMAGE:", flush=True)
-plt.imshow(orig_image)
-plt.show()
-
-output_image = seg_person(orig_image, masks, labels)
-print("INITIAL OUTPUT IMAGE:", flush=True)
-plt.imshow(output_image)
-plt.show()
-
-# Produce the new image in-painted by calling module 2
-
-print("impaint started", flush=True)
-bg = df_utils.impainting(output_image, masks, use_gpu=True)
-for m in masks:
-    plt.imshow(m)
-    plt.show()
-
-print("showing image", flush=True)
-plt.imshow(bg)
-plt.show()
-print("impaint done", flush=True)
-
-
-# Discard the first one since it contains the full image
-#For visualisation purpose
-i = 0
-for person_img, person_box in list(zip(person_images, person_boxes)):
-    i += 1
-    print("PERSON IMAGE:", flush=True)
-    plt.imshow(person_img.data)
-    plt.show()
-    person_img = np.asarray(person_img.data)
-
-    # Problem: The new pose may not be of the size as the new image. Thus, we need to reshape it!!
-    gen_img = human_body_generation.compute_new_image(person_img)
-    print("GENERATED IMAGE", flush=True)
-    plt.imshow(gen_img)
-
-    save_dir = './human_body_generation/test_generated_image/image1' + '_generated'+'.jpg'
-
-    # CHECK THIS! RIGHT NOW THE SEGMENTATION IS NOT DONE VERY WELL SINCE THE IMAGE IS TOO SMALL??
-    # plt.savefig(save_dir)
-    # resized = cv2.resize(gen_img, (int(gen_img.shape[1]*1.5), int(gen_img.shape[0]*1.5)), interpolation = cv2.INTER_AREA)
-
-    img_to_save = Image.fromarray(gen_img)
-    img_to_save.save(save_dir)
-    plt.show()
-
-    print("SHAPE OF THE IMAGE BEFORE PROCESSING", flush=True)
-    # print(resized.shape)
-    # orig_image_shape = resized.shape
-'''
-
 
 # Produces the final cropped image of the person (after doing the necessary rescaling), as well as its segmentation mask
 def produce_image_masked(generated_image, masks, labels, gen_img):
@@ -168,6 +73,27 @@ def fuse_images(output_image, gen_img, seg_mask, gen_boxes, x, y, orig_length, o
 
     return output_image, exp_mask_bw
 
+def expand_mask(mask):
+    height, width = mask.shape
+    exp_mask = np.zeros((height, width))
+
+    for i in range(height):
+        for j in range(width):
+            masked = False
+            for pad in range(1, 3):
+                if i - pad >= 0:
+                    masked = masked | mask[i - pad][j]
+                if i + pad < height:
+                    masked = masked | mask[i + pad][j]
+                if j - pad >= 0:
+                    masked = masked | mask[i][j - pad]
+                if j + pad < width:
+                    masked = masked | mask[i][j + pad]
+            exp_mask[i][j] = masked
+
+    return exp_mask
+
+
 # Computes the mask of the inpainting, this being, the mask that identifies the missing pixels in the image after doing the fusion
 def compute_mask_inpainting(exp_mask_bw, tot_seg_mask):
     diff_mask = tot_seg_mask
@@ -198,7 +124,18 @@ def generate_image(img_path):
 
     # Segment the image
     orig_image, masks, boxes, labels = process_image(image_path=img_path, threshold=0.5, model= seg_model)
+
+    # Fuse all the masks from the segmentation
     tot_seg_mask = df_utils.concat_masks(masks)
+
+    # Expand the mask to completely remove the person
+    tot_seg_mask = expand_mask(tot_seg_mask)
+
+    # Inpaint first to show bad results
+    inpaint = df_utils.impainting(orig_image, [tot_seg_mask], use_gpu=True)
+    cv2.imwrite("./results/first_inpaint.png", inpaint)
+    plt.imshow(inpaint)
+    plt.show()
 
     # Create the bounding boxes of each of the human bodies, and crop the corresponding image
     person_images, person_boxes = bbox_per_person(orig_image, boxes, labels)
@@ -210,20 +147,6 @@ def generate_image(img_path):
 
     # Define the image where all the human bodies are segmented out
     output_image = seg_person(orig_image, masks, labels)
-
-    # Produce the new image in-painted by calling module 2
-    '''
-    print("impaint started", flush=True)
-    bg = df_utils.impainting(output_image, masks, use_gpu=True)
-    for m in masks:
-        plt.imshow(m)
-        plt.show()
-    
-    print("showing image", flush=True)
-    plt.imshow(bg)
-    plt.show()
-    print("impaint done", flush=True)
-    '''
 
     # Discard the first one since it contains the full image
     # Iterate over all the people in the image
@@ -266,5 +189,5 @@ def generate_image(img_path):
 
 
 if __name__ == '__main__':
-    img_path = os.path.abspath('./human_body_generation/test_inference_img/image1.jpg')
+    img_path = os.path.abspath('./human_body_generation/test_inference_img/test_image_1.jpg')
     generate_image(img_path)
