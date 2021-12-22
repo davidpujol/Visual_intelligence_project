@@ -209,7 +209,7 @@ def compute_pose_estimation(oriImg):
         imageToTest = resize(oriImg, new_size, order=3, preserve_range=True)
 
         imageToTest_padded = imageToTest[np.newaxis, :, :, :]/255 - 0.5
-
+        # Resize the image to the size of the first network entry
         imageToProcess = st.resize(imageToTest_padded, (1, 368, 368), preserve_range=True, order=1)
 
         output1, output2 = model.predict(imageToProcess)
