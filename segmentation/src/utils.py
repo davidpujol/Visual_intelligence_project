@@ -33,8 +33,9 @@ def process_image(image_path, threshold, model, image_type=None):
 
         bg.paste(image, (50, 50))
         image = bg
-    plt.imshow(image)
-    plt.show()
+    #plt.imshow(image)
+    #plt.show()
+
     # keep a copy of the original image for OpenCV functions and applying masks
     orig_image = image.copy()
     print(np.array(image).shape)
@@ -136,7 +137,8 @@ def seg_background(image, masks, labels):
     alpha = 1 
     beta = 1# transparency for the segmentation map
     gamma = 0 # scalar added to each sum
-    mask = np.zeros(masks[0].shape)
+    #mask = np.zeros(bbox_per_person[0].shape)
+    mask = masks[0]
     for i in range(len(masks)):
         if labels[i] == 'person':
             mask = np.logical_or(mask, masks[i])
