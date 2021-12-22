@@ -18,11 +18,30 @@ seg_model = create_model()
 
 # Define the input path
 #img_path = os.path.abspath('./segmentation/input/image1.jpg')
-img_path = os.path.abspath('./human_body_generation/test_inference_img/image1.jpg')
+img_path = os.path.abspath('./human_body_generation/test_inference_img/test_image_3.jpg')
 threshold = 0.9#0.965
 
 # Segment the image
 orig_image, masks, boxes, labels = process_image(image_path=img_path, threshold=0.5, model= seg_model)
+
+'''
+y_min, x_min = boxes[0][0]
+y_max, x_max = boxes[0][1]
+height_box = x_max - x_min
+width_box = y_max - y_min
+
+# Rescale the box (change this)
+y_min -= (y - orig_length)
+y_max -= (y - orig_length)
+x_min -= (x - orig_width)
+x_max -= (x - orig_width)
+
+indices_of_mask = [(i+x_min, j+y_min, c) for i in range(height_box+1) for j in range(width_box) for c in range(channels) if seg_mask[i+x_min][j+y_min]]
+exp_mask_bw =  np.zeros((height, width))
+# Create the expanded mask
+for i,j,c in indices_of_mask:
+    exp_mask_bw[i][j] = True'''
+
 tot_seg_mask = df_utils.concat_masks(masks)
 print(tot_seg_mask, flush=True)
 # Created the zoomed image for each of the human bodies in the image
@@ -54,6 +73,7 @@ plt.imshow(bg)
 plt.show()
 print("impaint done", flush=True)
 '''
+
 # Discard the first one since it contains the full image
 #For visualisation purpose
 i = 0
