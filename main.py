@@ -189,5 +189,5 @@ def generate_image(img_path):
 
 
 if __name__ == '__main__':
-    img_path = os.path.abspath('./human_body_generation/test_inference_img/test_image_1.jpg')
+    img_path = os.path.abspath('./DeepFillv2/test_data/1.png')
     generate_image(img_path)
