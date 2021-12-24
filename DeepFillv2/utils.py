@@ -161,7 +161,7 @@ def ssim(pred, target):
 
 def save_img(img_copy):
     # Save to certain path
-    save_img_name = './background/background.png'
+    save_img_name = './results/result.png'
 
     cv2.imwrite(save_img_name, img_copy)
 

@@ -170,6 +170,10 @@ def generate_image(img_path):
         # Applies the segmentation module over the generated image, which allows us to
         # get rid of the generated background, and deal only with the new human poses
         generated_image, masks, gen_boxes, labels = process_image(image_path=save_dir, threshold=threshold, model= seg_model, image_type='gen')
+        try:
+            mask = masks[0]
+        except IndexError:
+            masks = [masks]
 
         # Generate the cropped image for each of the people in the image, as well as its corresponding segmented mask
         person_image_masked, seg_mask, x, y, orig_length, orig_width = produce_image_masked(generated_image, masks, labels, gen_img)
@@ -189,5 +193,5 @@ def generate_image(img_path):
 
 
 if __name__ == '__main__':
-    img_path = os.path.abspath('./DeepFillv2/test_data/1.png')
+    img_path = os.path.abspath('./human_body_generation/test_inference_img/image2.jpg')
     generate_image(img_path)
